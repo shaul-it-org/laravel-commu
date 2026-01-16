@@ -51,10 +51,19 @@
         'frontend' => 'bg-blue-100 text-blue-800',
         'devops' => 'bg-orange-100 text-orange-800',
         'ai' => 'bg-purple-100 text-purple-800',
+        'aiml' => 'bg-purple-100 text-purple-800',
         'database' => 'bg-red-100 text-red-800',
         'default' => 'bg-primary-100 text-primary-800',
     ];
-    $categoryClass = $categoryColors[strtolower($category ?? '')] ?? $categoryColors['default'];
+
+    // categoryColor가 명시적으로 설정된 경우 우선 사용
+    if ($categoryColor && $categoryColor !== 'primary' && isset($categoryColors[$categoryColor])) {
+        $categoryClass = $categoryColors[$categoryColor];
+    } else {
+        // 카테고리명 정규화: 소문자 변환 + 특수문자 제거 (AI/ML -> aiml)
+        $normalizedCategory = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $category ?? ''));
+        $categoryClass = $categoryColors[$normalizedCategory] ?? $categoryColors['default'];
+    }
 @endphp
 
 <article {{ $attributes->merge(['class' => 'card group overflow-hidden transition-all duration-300 hover:shadow-lg']) }}>
