@@ -17,8 +17,8 @@ return [
     // 'logger' => Sentry\Logger\DebugFileLogger::class, // By default this will log to `storage_path('logs/sentry.log')`
 
     // The release version of your application
-    // Example with dynamic git hash: trim(exec('git --git-dir ' . base_path('.git') . ' log --pretty="%h" -n1 HEAD'))
-    'release' => env('SENTRY_RELEASE'),
+    // CalVer + Git hash: YYYY.MM.{hash} 형식
+    'release' => env('SENTRY_RELEASE', date('Y.m') . '.' . trim(exec('git --git-dir ' . base_path('.git') . ' log --pretty="%h" -n1 HEAD'))),
 
     // When left empty or `null` the Laravel environment will be used (usually discovered from `APP_ENV` in your `.env`)
     'environment' => env('SENTRY_ENVIRONMENT'),
