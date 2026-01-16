@@ -43,7 +43,7 @@ help:
 
 # Docker + Vite 동시 실행
 dev:
-	@make up
+	@make restart
 	@echo "Vite 개발 서버 시작... (Ctrl+C로 종료)"
 	npm run dev
 
@@ -67,7 +67,7 @@ build:
 	cd docker && docker compose build
 
 restart:
-	cd docker && docker compose restart
+	cd docker && docker compose down && docker compose up -d
 
 logs:
 	cd docker && docker compose logs -f
