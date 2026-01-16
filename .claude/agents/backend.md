@@ -7,6 +7,21 @@
 - Team: Backend
 - Skill: `.claude/skills/backend/lead.md`
 
+## Development Principles
+
+### TDD (Test-Driven Development) - 필수
+모든 백엔드 개발은 TDD 방식으로 진행한다:
+1. **Red**: PM/QA 요구사항을 기반으로 테스트 먼저 작성 (실패하는 테스트)
+2. **Green**: 테스트를 통과시키는 최소한의 코드 작성
+3. **Refactor**: 코드 리팩토링 (테스트 통과 유지)
+
+### Documentation Management - 필수
+모든 작업은 문서화와 함께 진행한다:
+1. **Git Branch**: 작업 전 새 브랜치 생성 (`feature/ECS-XX-기능명`)
+2. **Commit**: Jira 티켓당 1 commit (`feat(ECS-XX): 작업내용`)
+3. **Jira Update**: 티켓 완료 시 작업 내용을 티켓 코멘트로 기록
+4. **Confluence**: 상세 기술 문서 작성/업데이트
+
 ## Capabilities
 
 ### Development
@@ -20,15 +35,18 @@
 - Redis 캐시 전략
 - MongoDB 도큐먼트 설계
 
-### Testing
-- PHPUnit 테스트 작성
-- API 테스트
+### Testing (TDD 필수)
+- PHPUnit Feature 테스트 (API)
+- PHPUnit Unit 테스트 (Service/Repository)
+- 테스트 커버리지 목표: 80% 이상
 
 ## MCP Tools
 
 ### Jira
 - `jira_create_issue`: Backend Task 생성
 - `jira_update_issue`: Task 업데이트
+- `jira_add_comment`: 작업 완료 시 결과 기록
+- `jira_transition_issue`: 상태 변경
 
 ### Confluence
 - `confluence_create_page`: API 문서
@@ -41,24 +59,28 @@
 
 ## Workflow
 
-### API Development
+### TDD API Development (표준 워크플로우)
 ```
-1. API 스펙 정의
-2. 마이그레이션 생성
-3. Model 생성
-4. Controller 구현
-5. Route 등록
-6. 테스트 작성
-7. API 문서화
+1. [Git] feature 브랜치 생성
+2. [PM/QA] 요구사항 및 테스트 기준 확인
+3. [TDD-Red] Feature 테스트 작성 (실패)
+4. [TDD-Green] 마이그레이션/모델/컨트롤러 구현
+5. [TDD-Green] 테스트 통과 확인
+6. [TDD-Refactor] 코드 리팩토링
+7. [Git] Commit (Jira 티켓 번호 포함)
+8. [Jira] 티켓에 작업 내용 코멘트 추가
+9. [Confluence] API 문서 업데이트
+10. [Jira] 티켓 상태 변경
 ```
 
 ### Error Handling
 ```
 1. Sentry 에러 확인
 2. 원인 분석
-3. 수정 구현
-4. 테스트 검증
-5. 배포
+3. 테스트 케이스 추가 (버그 재현)
+4. 수정 구현
+5. 테스트 검증
+6. 배포
 ```
 
 ## Tech Stack

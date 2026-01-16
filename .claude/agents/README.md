@@ -11,6 +11,26 @@
 └── commands/         # 슬래시 명령어 (사용자 호출)
 ```
 
+## Development Principles
+
+### Backend TDD (필수)
+모든 백엔드 개발은 TDD 방식으로 진행한다:
+```
+Red → Green → Refactor
+1. PM/QA 요구사항을 테스트로 작성 (실패)
+2. 테스트를 통과시키는 코드 작성
+3. 코드 리팩토링 (테스트 유지)
+```
+
+### Documentation Management (필수)
+모든 백엔드 작업은 문서화와 함께 진행한다:
+```
+1. [Git] 작업 전 feature 브랜치 생성
+2. [Commit] Jira 티켓당 1 commit
+3. [Jira] 완료 시 작업 내용 코멘트 기록
+4. [Confluence] 상세 기술 문서 작성
+```
+
 ## 에이전트 목록
 
 | Agent | File | 역할 | MCP Tools |
@@ -18,7 +38,7 @@
 | PM | `pm.md` | 프로젝트 관리, Jira/Confluence | Jira, Confluence, Slack |
 | Design | `design.md` | UX/UI 디자인, 스펙 문서화 | Jira, Confluence, Slack |
 | Frontend | `frontend.md` | Blade/Tailwind 개발 | Jira, Confluence, Playwright |
-| Backend | `backend.md` | Laravel API, DB 개발 | Jira, Confluence, Sentry |
+| Backend | `backend.md` | Laravel API, DB 개발 **(TDD 필수)** | Jira, Confluence, Sentry |
 | DevOps | `devops.md` | 인프라, CI/CD, 모니터링 | Jira, Confluence, Sentry |
 | QA | `qa.md` | 테스트, 품질 보증 | Jira, Confluence, Playwright, Sentry |
 | Docs | `docs.md` | 기술 문서, 다이어그램 | Confluence, Jira |
@@ -32,12 +52,19 @@ Task(subagent_type="general-purpose", prompt="PM Agent로서 새 기능 Epic을 
 
 ### 워크플로우 예시
 ```
-1. PM Agent: Epic 생성, 요구사항 문서화
-2. Design Agent: 디자인 스펙 작성
-3. Frontend/Backend Agent: 개발 Task 수행
-4. QA Agent: 테스트 수행
-5. DevOps Agent: 배포
-6. Docs Agent: 문서 업데이트
+1. [Git] feature 브랜치 생성
+2. PM Agent: Epic 생성, 요구사항 문서화
+3. Design Agent: 디자인 스펙 작성
+4. Frontend Agent: UI 개발
+5. Backend Agent (TDD):
+   - 테스트 먼저 작성 (Red)
+   - 코드 구현 (Green)
+   - 리팩토링 (Refactor)
+   - 티켓별 커밋 + Jira 코멘트
+6. DevOps Agent: 인프라/배포
+7. QA Agent: 테스트 수행
+8. Docs Agent: 문서 업데이트
+9. [Git] PR/Merge
 ```
 
 ## 에이전트 vs 스킬 vs 명령어

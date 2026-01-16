@@ -1,24 +1,49 @@
 # /new-feature
 
-새로운 기능을 기획하고 모든 팀 에이전트가 협업하여 작업을 정의한다.
+새로운 기능을 기획하고 모든 팀 에이전트가 협업하여 작업을 정의하고 개발한다.
 
 ## Arguments
 - $1: 기능명 (영문, kebab-case)
 - $2: 기능 설명
 
+## Development Principles
+
+### TDD (Test-Driven Development) - Backend 필수
+```
+Red → Green → Refactor
+1. PM/QA 요구사항을 테스트로 작성 (실패)
+2. 테스트를 통과시키는 코드 작성
+3. 코드 리팩토링 (테스트 유지)
+```
+
+### Documentation Management - Backend 필수
+```
+1. [Git] 작업 전 feature 브랜치 생성
+2. [Commit] Jira 티켓당 1 commit
+3. [Jira] 완료 시 작업 내용 코멘트 기록
+4. [Confluence] 상세 기술 문서 작성
+```
+
 ## Agents
 
 | Phase | Agent | Context File |
 |-------|-------|--------------|
+| 0 | Git | 브랜치 생성 |
 | 1 | PM | `.claude/agents/pm.md` |
 | 2 | Design | `.claude/agents/design.md` |
 | 3 | Frontend | `.claude/agents/frontend.md` |
-| 3 | Backend | `.claude/agents/backend.md` |
+| 3 | Backend (TDD) | `.claude/agents/backend.md` |
 | 4 | DevOps | `.claude/agents/devops.md` |
 | 5 | QA | `.claude/agents/qa.md` |
 | 6 | Docs | `.claude/agents/docs.md` |
 
 ## Instructions
+
+### Phase 0: Git Branch
+작업 시작 전 feature 브랜치를 생성한다:
+```bash
+git checkout -b feature/$1
+```
 
 ### Phase 1: PM Agent
 `.claude/agents/pm.md` 컨텍스트를 읽고 다음을 수행하라:
@@ -48,11 +73,24 @@
 3. API 연동 포인트 정의
 4. Jira Frontend Tasks 생성
 
-**Backend** (`.claude/agents/backend.md`):
+**Backend** (`.claude/agents/backend.md`) - TDD 필수:
+
+*TDD 개발 순서:*
+1. PM/QA 요구사항을 Feature 테스트로 작성 (Red)
+2. 테스트 통과를 위한 코드 구현 (Green)
+3. 코드 리팩토링 (Refactor)
+
+*작업 내용:*
 1. API 엔드포인트 설계
 2. DB 스키마 설계
-3. 비즈니스 로직 정의
-4. Jira Backend Tasks 생성
+3. **테스트 먼저 작성** (tests/Feature/)
+4. 마이그레이션/모델/컨트롤러 구현
+5. 테스트 통과 확인
+6. Jira Backend Tasks 생성 및 업데이트
+
+*Documentation:*
+- 각 티켓 완료 시 `jira_add_comment`로 작업 내용 기록
+- Confluence에 API 문서 작성
 
 ### Phase 4: DevOps Agent
 `.claude/agents/devops.md` 컨텍스트를 읽고 다음을 수행하라:
@@ -105,12 +143,39 @@ $1/
 
 ```mermaid
 flowchart LR
-    PM[Phase 1\nPM] --> Design[Phase 2\nDesign]
-    Design --> Dev[Phase 3\nFE + BE]
+    Git[Phase 0\nGit Branch] --> PM[Phase 1\nPM]
+    PM --> Design[Phase 2\nDesign]
+    Design --> Dev[Phase 3\nFE + BE TDD]
     Dev --> DevOps[Phase 4\nDevOps]
     DevOps --> QA[Phase 5\nQA]
     QA --> Docs[Phase 6\nDocs]
+    Docs --> Commit[Commit\n& Push]
 ```
+
+## Git Commit 규칙
+
+### Branch Naming
+```
+feature/$1           # 새 기능
+bugfix/ECS-XX        # 버그 수정
+hotfix/ECS-XX        # 긴급 수정
+```
+
+### Commit Message
+```
+feat(ECS-XX): 작업 내용 요약
+
+- 상세 내용 1
+- 상세 내용 2
+
+Jira: ECS-XX
+```
+
+### 티켓당 1 Commit
+각 Jira 티켓 완료 시:
+1. 해당 티켓 작업 내용만 커밋
+2. `jira_add_comment`로 작업 결과 기록
+3. `jira_transition_issue`로 상태 변경
 
 ## Example
 
@@ -119,10 +184,16 @@ flowchart LR
 ```
 
 실행 순서:
-1. PM Agent → Epic ECS-XX 생성, 요구사항 문서화
-2. Design Agent → 로그인/회원가입 UI 스펙
-3. Frontend Agent → Blade 컴포넌트 Task
-4. Backend Agent → Auth API Task
-5. DevOps Agent → 세션/토큰 설정 Task
-6. QA Agent → 인증 테스트 시나리오
-7. Docs Agent → 인증 문서 정리
+1. **Git** → `feature/user-authentication` 브랜치 생성
+2. **PM Agent** → Epic ECS-XX 생성, 요구사항 문서화
+3. **Design Agent** → 로그인/회원가입 UI 스펙
+4. **Frontend Agent** → Blade 컴포넌트 Task
+5. **Backend Agent (TDD)**:
+   - 테스트 먼저 작성 (LoginTest, RegisterTest)
+   - Auth API 구현
+   - 테스트 통과 확인
+   - 티켓별 커밋 + Jira 코멘트
+6. **DevOps Agent** → 세션/토큰 설정 Task
+7. **QA Agent** → 인증 테스트 시나리오
+8. **Docs Agent** → 인증 문서 정리
+9. **Git** → PR 생성 또는 merge
