@@ -125,7 +125,7 @@
                         <img src="{{ $authorAvatar }}" alt="{{ $author }}" class="h-6 w-6 rounded-full object-cover">
                     @elseif($author)
                         <div class="flex h-6 w-6 items-center justify-center rounded-full bg-neutral-200 text-xs font-medium text-neutral-600">
-                            {{ strtoupper(substr($author, 0, 1)) }}
+                            {{ mb_strtoupper(mb_substr($author, 0, 1), 'UTF-8') }}
                         </div>
                     @endif
                     @if($author)
