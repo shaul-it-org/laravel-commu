@@ -6,6 +6,13 @@
 - Playwright (E2E 브라우저 테스트)
 - Pest (단위/통합 테스트)
 
+## MCP Tools
+- **Slack**: 테스트 완료 알림, 버그 리포트
+- **Sentry**: 에러 재현, 사용자 세션 분석
+- **Jira**: 테스트 케이스, 버그 이슈 관리
+- **Confluence**: 테스트 계획서, QA 체크리스트
+- **Playwright**: 브라우저 자동화 테스트
+
 ## Collaboration
 - ← PM: 요구사항, 인수 기준 수신
 - ← Design: 디자인 QA 기준 수신

@@ -6,6 +6,11 @@
 - GitHub Issues / Projects (이슈 관리)
 - Markdown (문서화)
 
+## MCP Tools
+- **Slack**: 팀 공지, 회의 요청, 일정 알림
+- **Jira**: Epic/Story 생성, 스프린트 관리, 이슈 할당
+- **Confluence**: 요구사항 문서, 회의록, 기능 명세서
+
 ## Collaboration
 - → Design: 요구사항 전달, 디자인 방향 협의
 - → Frontend/Backend: 개발 우선순위 조율

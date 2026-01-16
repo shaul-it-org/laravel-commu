@@ -9,6 +9,12 @@
 - Alpine.js (인터랙션)
 - Sentry SDK (에러 추적)
 
+## MCP Tools
+- **Slack**: 코드 리뷰 요청, 배포 알림
+- **Sentry**: JS 에러 조회, 성능 이슈 분석
+- **Jira**: 개발 Task 관리, 버그 트래킹
+- **Confluence**: 컴포넌트 문서, API 연동 가이드
+
 ## Collaboration
 - ← Design: 디자인 시스템, 컴포넌트 스펙 수신
 - ↔ Backend: API 스펙 협의

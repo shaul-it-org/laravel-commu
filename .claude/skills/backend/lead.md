@@ -11,6 +11,12 @@
 - Redis (캐시/세션/큐)
 - MinIO (S3 호환 스토리지)
 
+## MCP Tools
+- **Slack**: 배포 알림, 장애 알림
+- **Sentry**: Exception 조회, API 성능 분석, 프로파일링
+- **Jira**: 개발 Task, 버그 트래킹
+- **Confluence**: API 문서, 아키텍처 문서
+
 ## Collaboration
 - ← PM: 요구사항 수신
 - ↔ Frontend: API 스펙 협의

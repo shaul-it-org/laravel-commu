@@ -9,6 +9,12 @@
 - Sentry (에러 모니터링)
 - Ubuntu 24.04
 
+## MCP Tools
+- **Slack**: 배포 상태 알림, 인프라 알림, 장애 알림
+- **Sentry**: 전체 시스템 에러 모니터링, Release 관리
+- **Jira**: 인프라 Task, 배포 일정 관리
+- **Confluence**: 인프라 구성도, 배포 가이드
+
 ## Collaboration
 - ← Backend: 배포 요구사항 수신
 - ← PM: 배포 일정 협의
