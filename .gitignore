@@ -4,6 +4,7 @@
 .env.backup
 .env.production
 .claude/*.local.md
+docker/.env
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -23,3 +24,4 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+/.playwright-mcp/

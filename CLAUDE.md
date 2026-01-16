@@ -32,11 +32,26 @@ php artisan migrate
 
 # 프론트엔드 빌드
 npm run build
+
+# Docker (Makefile 사용)
+make up          # 컨테이너 시작
+make down        # 컨테이너 중지
+make logs        # 로그 확인
+make sh          # WAS 컨테이너 접속
+make migrate     # 마이그레이션
+make test        # 테스트
+make pint        # 코드 스타일
+make xdebug-off      # 비활성화
+make xdebug-debug    # IDE 스텝 디버깅
+make xdebug-develop  # 향상된 에러 출력
+make xdebug-coverage # 코드 커버리지
 ```
 
 ## Architecture
 
 - **Routes**: `routes/web.php` (웹), `routes/console.php` (CLI 명령어)
 - **Bootstrap**: `bootstrap/app.php`에서 라우팅, 미들웨어, 예외 처리 설정
-- **Database**: SQLite 사용 (`database/database.sqlite`), 테스트 시 인메모리 SQLite
+- **Database**: PostgreSQL (docker)
+- **Cache/Queue**: Redis (docker)
+- **Storage**: MinIO (docker, S3 호환)
 - **Frontend**: Vite + Tailwind CSS, 엔트리포인트는 `resources/css/app.css`, `resources/js/app.js`
