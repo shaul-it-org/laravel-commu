@@ -5,7 +5,7 @@
 ## 개요
 - **기능**: Sentry Integration
 - **팀**: Backend
-- **상태**: 진행중
+- **상태**: 완료
 - **의존성**: DevOps (DSN 발급 필요)
 
 ## Tasks
@@ -16,9 +16,9 @@
 | 2 | config/sentry.php 설정 | | 완료 | |
 | 3 | 환경별 DSN 설정 | | 완료 | .env |
 | 4 | Exception Handler 연동 | | 완료 | bootstrap/app.php |
-| 5 | 민감 정보 필터링 설정 | | 대기 | scrubData |
-| 6 | 커스텀 컨텍스트 추가 | | 대기 | 사용자 정보 등 |
-| 7 | 테스트 에러 발생 | | 대기 | php artisan sentry:test |
+| 5 | 민감 정보 필터링 설정 | | 완료 | before_send |
+| 6 | 커스텀 컨텍스트 추가 | | 완료 | AppServiceProvider |
+| 7 | 테스트 에러 발생 | | 완료 | php artisan sentry:test |
 
 ## 상세 내용
 
@@ -50,30 +50,57 @@ use Sentry\Laravel\Integration;
 })
 ```
 
-### 5. 민감 정보 필터링 설정
+### 5. 민감 정보 필터링 설정 ✅
 ```php
 // config/sentry.php
-'send_default_pii' => false,
 'before_send' => function (\Sentry\Event $event): ?\Sentry\Event {
-    // 민감 정보 필터링
+    $request = $event->getRequest();
+    if ($request !== null) {
+        $sensitiveKeys = ['password', 'password_confirmation', 'token', 'secret', 'credit_card'];
+        $data = $request['data'] ?? [];
+        foreach ($sensitiveKeys as $key) {
+            if (isset($data[$key])) {
+                $data[$key] = '[FILTERED]';
+            }
+        }
+        $request['data'] = $data;
+        $event->setRequest($request);
+    }
     return $event;
 },
 ```
 
-### 6. 커스텀 컨텍스트 추가
+**필터링 대상:**
+- password, password_confirmation
+- token, secret
+- credit_card
+
+### 6. 커스텀 컨텍스트 추가 ✅
 ```php
 // app/Providers/AppServiceProvider.php
-\Sentry\configureScope(function (\Sentry\State\Scope $scope): void {
-    if (auth()->check()) {
-        $scope->setUser([
-            'id' => auth()->id(),
-            'email' => auth()->user()->email,
-        ]);
+private function configureSentryUserContext(): void
+{
+    if (! app()->bound('sentry')) {
+        return;
     }
-});
+
+    $this->app->booted(function () {
+        \Sentry\configureScope(function (\Sentry\State\Scope $scope): void {
+            if (Auth::check()) {
+                $user = Auth::user();
+                $scope->setUser([
+                    'id' => $user->id,
+                    'email' => $user->email,
+                    'username' => $user->name ?? null,
+                ]);
+            }
+        });
+    });
+}
 ```
 
-### 7. 테스트 에러 발생
+### 7. 테스트 에러 발생 ✅
 ```bash
 php artisan sentry:test
+# Test event sent with ID: 2d2f05f6067443a9b0d4c3ec4b8542c8
 ```

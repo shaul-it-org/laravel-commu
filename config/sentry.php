@@ -41,6 +41,25 @@ return [
     // @see: https://docs.sentry.io/platforms/php/guides/laravel/configuration/options/#send_default_pii
     'send_default_pii' => env('SENTRY_SEND_DEFAULT_PII', false),
 
+    // @see: https://docs.sentry.io/platforms/php/guides/laravel/configuration/options/#before_send
+    'before_send' => function (\Sentry\Event $event): ?\Sentry\Event {
+        // 민감 정보가 포함된 요청 데이터 필터링
+        $request = $event->getRequest();
+        if ($request !== null) {
+            $sensitiveKeys = ['password', 'password_confirmation', 'token', 'secret', 'credit_card'];
+            $data = $request['data'] ?? [];
+            foreach ($sensitiveKeys as $key) {
+                if (isset($data[$key])) {
+                    $data[$key] = '[FILTERED]';
+                }
+            }
+            $request['data'] = $data;
+            $event->setRequest($request);
+        }
+
+        return $event;
+    },
+
     // @see: https://docs.sentry.io/platforms/php/guides/laravel/configuration/options/#ignore_exceptions
     // 'ignore_exceptions' => [],
 
