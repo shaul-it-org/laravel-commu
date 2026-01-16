@@ -6,7 +6,7 @@
 
 | 기능명 | 상태 | 담당 | 생성일 |
 |--------|------|------|--------|
-| (예시) user-auth | 진행중 | PM Lead | 2024-01-16 |
+| [sentry-integration](./sentry-integration/) | 계획중 | PM Lead | 2025-01-16 |
 
 ## 상태 정의
 

@@ -1,3 +1,21 @@
+# {FEATURE_NAME} 폴더 구조
+
+기능별로 폴더를 생성하고 다음 파일들을 포함합니다.
+
+```
+docs/features/{feature-name}/
+├── README.md           # 기능 개요, 협의 내용
+├── pm-tasks.md         # PM 팀 Tasks
+├── design-tasks.md     # Design 팀 Tasks
+├── frontend-tasks.md   # Frontend 팀 Tasks
+├── backend-tasks.md    # Backend 팀 Tasks
+├── devops-tasks.md     # DevOps 팀 Tasks
+└── qa-tasks.md         # QA 팀 Tasks
+```
+
+## README.md 템플릿
+
+```markdown
 # {FEATURE_NAME}
 
 > {FEATURE_DESCRIPTION}
@@ -22,76 +40,46 @@
 ### 팀간 의존성
 -
 
----
+## 팀별 Tasks
 
-## PM Tasks
-
-| Task | 담당자 | 상태 | 비고 |
-|------|--------|------|------|
-| 요구사항 정리 | | 대기 | |
-| 일정 수립 | | 대기 | |
-| 이해관계자 공유 | | 대기 | |
-
----
-
-## Design Tasks
-
-| Task | 담당자 | 상태 | 비고 |
-|------|--------|------|------|
-| UX 플로우 설계 | | 대기 | |
-| 와이어프레임 작성 | | 대기 | |
-| UI 목업 제작 | | 대기 | |
-| 디자인 리뷰 | | 대기 | |
-
----
-
-## Frontend Tasks
-
-| Task | 담당자 | 상태 | 비고 |
-|------|--------|------|------|
-| 컴포넌트 설계 | | 대기 | |
-| 페이지 구현 | | 대기 | |
-| API 연동 | | 대기 | |
-| 테스트 작성 | | 대기 | |
-
----
-
-## Backend Tasks
-
-| Task | 담당자 | 상태 | 비고 |
-|------|--------|------|------|
-| API 설계 | | 대기 | |
-| DB 스키마 설계 | | 대기 | |
-| API 개발 | | 대기 | |
-| 테스트 작성 | | 대기 | |
-
----
-
-## DevOps Tasks
-
-| Task | 담당자 | 상태 | 비고 |
-|------|--------|------|------|
-| 인프라 준비 | | 대기 | |
-| 배포 설정 | | 대기 | |
-| 모니터링 설정 | | 대기 | |
-
----
-
-## QA Tasks (Playwright)
-
-| Task | 담당자 | 상태 | 비고 |
-|------|--------|------|------|
-| 사용자 시나리오 검토 | | 대기 | |
-| QA 체크리스트 작성 | | 대기 | |
-| 테스트 케이스 정의 | | 대기 | |
-| E2E 브라우저 테스트 | | 대기 | Playwright |
-| 크로스 브라우저 테스트 | | 대기 | Playwright |
-| 회귀 테스트 | | 대기 | Playwright |
-
----
+| 팀 | 문서 | 상태 |
+|----|------|------|
+| PM | [pm-tasks.md](./pm-tasks.md) | 대기 |
+| Design | [design-tasks.md](./design-tasks.md) | 대기 |
+| Frontend | [frontend-tasks.md](./frontend-tasks.md) | 대기 |
+| Backend | [backend-tasks.md](./backend-tasks.md) | 대기 |
+| DevOps | [devops-tasks.md](./devops-tasks.md) | 대기 |
+| QA | [qa-tasks.md](./qa-tasks.md) | 대기 |
 
 ## 진행 이력
 
 | 날짜 | 내용 | 작성자 |
 |------|------|--------|
 | {DATE} | 기능 생성 | |
+```
+
+## 팀별 Tasks 템플릿
+
+```markdown
+# {TEAM} Tasks - {FEATURE_NAME}
+
+[← 기능 개요로 돌아가기](./README.md)
+
+## 개요
+- **기능**: {FEATURE_NAME}
+- **팀**: {TEAM}
+- **상태**: 대기
+
+## Tasks
+
+| # | Task | 담당자 | 상태 | 비고 |
+|---|------|--------|------|------|
+| 1 | Task 1 | | 대기 | |
+| 2 | Task 2 | | 대기 | |
+
+## 상세 내용
+
+### 1. Task 1
+- [ ] 세부 항목 1
+- [ ] 세부 항목 2
+```
