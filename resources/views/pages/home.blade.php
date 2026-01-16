@@ -118,13 +118,13 @@
             {{-- Article Grid --}}
             <div class="grid gap-6 sm:grid-cols-2">
                 <x-ui.article-card
-                    href="#"
+                    href="/articles/test"
                     category="Backend"
                     title="PostgreSQL 18 성능 튜닝 완벽 가이드"
                     excerpt="PostgreSQL 18의 새로운 기능과 함께 대용량 데이터베이스 성능을 최적화하는 방법을 단계별로 알아봅니다."
-                    author="김디비"
-                    date="2026.01.14"
-                    readTime="10"
+                    author="김개발"
+                    date="2026.01.15"
+                    readTime="15"
                     :tags="['postgresql', 'database', 'performance']"
                     :featured="true"
                 />
