@@ -8,3 +8,10 @@ Sentry.init({
     replaysSessionSampleRate: 0.1,
     replaysOnErrorSampleRate: 1.0,
 });
+
+// Sentry test function (development only)
+if (import.meta.env.DEV) {
+    window.testSentry = () => {
+        throw new Error('Sentry Frontend Test Error');
+    };
+}
