@@ -15,7 +15,7 @@
 
 @props([
     'src' => null,
-    'alt' => '',
+    'alt' => null,
     'size' => 'md',
     'initials' => null,
 ])
@@ -30,11 +30,21 @@
     };
 
     $classes = "inline-flex items-center justify-center overflow-hidden rounded-full bg-neutral-200 font-medium text-neutral-600 $sizeClasses";
+
+    // Determine the alt text:
+    // - If alt is explicitly set to empty string '', use it (decorative image)
+    // - If alt is null (not provided), fallback to initials or generic label
+    $altText = match(true) {
+        $alt === '' => '',
+        $alt !== null => $alt,
+        $initials !== null => $initials,
+        default => 'Avatar',
+    };
 @endphp
 
 <span {{ $attributes->merge(['class' => $classes]) }}>
     @if($src)
-        <img src="{{ $src }}" alt="{{ $alt }}" class="h-full w-full object-cover">
+        <img src="{{ $src }}" alt="{{ $altText }}" class="h-full w-full object-cover">
     @elseif($initials)
         {{ $initials }}
     @else

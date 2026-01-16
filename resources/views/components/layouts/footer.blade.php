@@ -22,29 +22,29 @@
             <div>
                 <h4 class="text-sm font-semibold text-neutral-900">Community</h4>
                 <ul class="mt-4 space-y-3">
-                    <li><a href="#" class="text-sm text-neutral-500 transition-colors hover:text-primary-600">Discussions</a></li>
-                    <li><a href="#" class="text-sm text-neutral-500 transition-colors hover:text-primary-600">Categories</a></li>
-                    <li><a href="#" class="text-sm text-neutral-500 transition-colors hover:text-primary-600">Tags</a></li>
-                    <li><a href="#" class="text-sm text-neutral-500 transition-colors hover:text-primary-600">Members</a></li>
+                    <li><span aria-disabled="true" class="text-sm text-neutral-400 pointer-events-none cursor-default">Discussions</span></li>
+                    <li><span aria-disabled="true" class="text-sm text-neutral-400 pointer-events-none cursor-default">Categories</span></li>
+                    <li><span aria-disabled="true" class="text-sm text-neutral-400 pointer-events-none cursor-default">Tags</span></li>
+                    <li><span aria-disabled="true" class="text-sm text-neutral-400 pointer-events-none cursor-default">Members</span></li>
                 </ul>
             </div>
 
             <div>
                 <h4 class="text-sm font-semibold text-neutral-900">Resources</h4>
                 <ul class="mt-4 space-y-3">
-                    <li><a href="#" class="text-sm text-neutral-500 transition-colors hover:text-primary-600">Documentation</a></li>
-                    <li><a href="#" class="text-sm text-neutral-500 transition-colors hover:text-primary-600">FAQ</a></li>
-                    <li><a href="#" class="text-sm text-neutral-500 transition-colors hover:text-primary-600">Guidelines</a></li>
-                    <li><a href="#" class="text-sm text-neutral-500 transition-colors hover:text-primary-600">API</a></li>
+                    <li><span aria-disabled="true" class="text-sm text-neutral-400 pointer-events-none cursor-default">Documentation</span></li>
+                    <li><span aria-disabled="true" class="text-sm text-neutral-400 pointer-events-none cursor-default">FAQ</span></li>
+                    <li><span aria-disabled="true" class="text-sm text-neutral-400 pointer-events-none cursor-default">Guidelines</span></li>
+                    <li><span aria-disabled="true" class="text-sm text-neutral-400 pointer-events-none cursor-default">API</span></li>
                 </ul>
             </div>
 
             <div>
                 <h4 class="text-sm font-semibold text-neutral-900">Legal</h4>
                 <ul class="mt-4 space-y-3">
-                    <li><a href="#" class="text-sm text-neutral-500 transition-colors hover:text-primary-600">Privacy Policy</a></li>
-                    <li><a href="#" class="text-sm text-neutral-500 transition-colors hover:text-primary-600">Terms of Service</a></li>
-                    <li><a href="#" class="text-sm text-neutral-500 transition-colors hover:text-primary-600">Cookie Policy</a></li>
+                    <li><span aria-disabled="true" class="text-sm text-neutral-400 pointer-events-none cursor-default">Privacy Policy</span></li>
+                    <li><span aria-disabled="true" class="text-sm text-neutral-400 pointer-events-none cursor-default">Terms of Service</span></li>
+                    <li><span aria-disabled="true" class="text-sm text-neutral-400 pointer-events-none cursor-default">Cookie Policy</span></li>
                 </ul>
             </div>
         </div>
@@ -60,12 +60,12 @@
                 <span class="text-lg font-semibold text-neutral-900">Community</span>
             </a>
             <div class="flex flex-wrap gap-4 text-sm">
-                <a href="#" class="text-neutral-500 hover:text-primary-600">Discussions</a>
-                <a href="#" class="text-neutral-500 hover:text-primary-600">Categories</a>
-                <a href="#" class="text-neutral-500 hover:text-primary-600">Members</a>
-                <a href="#" class="text-neutral-500 hover:text-primary-600">FAQ</a>
-                <a href="#" class="text-neutral-500 hover:text-primary-600">Privacy</a>
-                <a href="#" class="text-neutral-500 hover:text-primary-600">Terms</a>
+                <span aria-disabled="true" class="text-neutral-400 pointer-events-none cursor-default">Discussions</span>
+                <span aria-disabled="true" class="text-neutral-400 pointer-events-none cursor-default">Categories</span>
+                <span aria-disabled="true" class="text-neutral-400 pointer-events-none cursor-default">Members</span>
+                <span aria-disabled="true" class="text-neutral-400 pointer-events-none cursor-default">FAQ</span>
+                <span aria-disabled="true" class="text-neutral-400 pointer-events-none cursor-default">Privacy</span>
+                <span aria-disabled="true" class="text-neutral-400 pointer-events-none cursor-default">Terms</span>
             </div>
         </div>
 

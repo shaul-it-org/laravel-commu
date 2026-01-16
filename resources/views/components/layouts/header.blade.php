@@ -46,7 +46,9 @@
                 type="button"
                 class="inline-flex items-center justify-center rounded-lg p-2 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 lg:hidden"
                 aria-label="Open menu"
-                onclick="document.getElementById('mobile-menu').classList.toggle('hidden')"
+                aria-expanded="false"
+                aria-controls="mobile-menu"
+                onclick="const menu = document.getElementById('mobile-menu'); const isHidden = menu.classList.toggle('hidden'); this.setAttribute('aria-expanded', String(!isHidden));"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />

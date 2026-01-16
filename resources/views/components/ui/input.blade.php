@@ -32,7 +32,7 @@
 
 <div {{ $attributes->only('class')->merge(['class' => 'w-full']) }}>
     @if($label)
-        <label for="{{ $name }}" class="mb-1.5 block text-sm font-medium text-neutral-700">
+        <label @if($name) for="{{ $name }}" @endif class="mb-1.5 block text-sm font-medium text-neutral-700">
             {{ $label }}
         </label>
     @endif

@@ -7,7 +7,7 @@ use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
 /**
- * 반응형 레이아웃 테스트
+ * 반응형 레이아웃 테스트 - Tech Blog
  *
  * Breakpoints:
  * - Mobile: 375px
@@ -22,19 +22,18 @@ use Laravel\Dusk\Browser;
 class ResponsiveLayoutTest extends DuskTestCase
 {
     #[Test]
-    public function desktop_shows_three_column_layout(): void
+    public function desktop_shows_two_column_layout(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->resize(1280, 800)
                 ->visit('/')
-                // 왼쪽 사이드바 (Categories)
-                ->assertVisible('aside')
                 // 메인 컨텐츠
                 ->assertVisible('main')
-                // 오른쪽 사이드바 (Widgets)
-                ->assertSee('Popular Tags')
-                ->assertSee('Top Contributors')
-                ->assertSee('Community Stats');
+                // 사이드바 (시리즈, 카테고리, 태그, 뉴스레터)
+                ->assertSee('인기 시리즈')
+                ->assertSee('카테고리')
+                ->assertSee('인기 태그')
+                ->assertSee('뉴스레터 구독');
         });
     }
 
@@ -44,8 +43,8 @@ class ResponsiveLayoutTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser->resize(768, 1024)
                 ->visit('/')
-                ->assertSee('Welcome to Community')
-                ->assertSee('Latest');
+                ->assertSee('Featured')
+                ->assertSee('최신 아티클');
         });
     }
 
@@ -55,11 +54,12 @@ class ResponsiveLayoutTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser->resize(375, 812)
                 ->visit('/')
-                // 모바일 카테고리 뱃지 표시
-                ->assertSee('General')
+                // 모바일 카테고리 pills
+                ->assertSee('전체')
+                ->assertSee('Backend')
                 // 메인 컨텐츠
-                ->assertSee('Latest')
-                ->assertSee('How to optimize Laravel queries');
+                ->assertSee('최신 아티클')
+                ->assertSee('PostgreSQL 18 성능 튜닝 완벽 가이드');
         });
     }
 
@@ -88,18 +88,39 @@ class ResponsiveLayoutTest extends DuskTestCase
     }
 
     #[Test]
-    public function hero_section_responsive_text(): void
+    public function hero_section_responsive(): void
     {
         $this->browse(function (Browser $browser) {
-            // Desktop - larger text
+            // Desktop - Featured article with large layout
             $browser->resize(1280, 800)
                 ->visit('/')
-                ->assertSee('Welcome to Community');
+                ->assertSee('Laravel 12와 PHP 8.4로 만드는 현대적인 웹 애플리케이션');
 
-            // Mobile - still visible but adjusted
+            // Mobile - Still visible but adjusted
             $browser->resize(375, 812)
                 ->visit('/')
-                ->assertSee('Welcome to Community');
+                ->assertSee('Laravel 12와 PHP 8.4로 만드는 현대적인 웹 애플리케이션');
+        });
+    }
+
+    #[Test]
+    public function category_tabs_responsive(): void
+    {
+        $this->browse(function (Browser $browser) {
+            // Desktop - Tab buttons
+            $browser->resize(1280, 800)
+                ->visit('/')
+                ->assertSee('전체')
+                ->assertSee('Backend')
+                ->assertSee('Frontend')
+                ->assertSee('DevOps');
+
+            // Mobile - Category pills (horizontal scroll)
+            $browser->resize(375, 812)
+                ->visit('/')
+                ->assertSee('전체')
+                ->assertSee('Backend')
+                ->assertSee('AI/ML');
         });
     }
 
@@ -107,14 +128,14 @@ class ResponsiveLayoutTest extends DuskTestCase
     public function footer_adjusts_for_mobile(): void
     {
         $this->browse(function (Browser $browser) {
-            // Desktop - 4 column grid
+            // Desktop - Multi column grid
             $browser->resize(1280, 800)
                 ->visit('/')
                 ->assertSee('Community')
                 ->assertSee('Resources')
                 ->assertSee('Legal');
 
-            // Mobile - simplified layout
+            // Mobile - Simplified layout
             $browser->resize(375, 812)
                 ->visit('/')
                 ->assertSee('© 2026 Community');
@@ -128,8 +149,8 @@ class ResponsiveLayoutTest extends DuskTestCase
             $browser->resize(320, 480)
                 ->visit('/')
                 // 페이지가 여전히 렌더링되어야 함
-                ->assertSee('Community')
-                ->assertSee('Welcome');
+                ->assertSee('Tech Blog')
+                ->assertSee('Featured');
         });
     }
 
@@ -140,7 +161,7 @@ class ResponsiveLayoutTest extends DuskTestCase
             $browser->resize(2560, 1440)
                 ->visit('/')
                 // 컨텐츠가 max-width 내에서 렌더링
-                ->assertSee('Welcome to Community')
+                ->assertSee('Laravel 12와 PHP 8.4로 만드는 현대적인 웹 애플리케이션')
                 ->assertPresent('.container-main');
         });
     }
@@ -152,12 +173,29 @@ class ResponsiveLayoutTest extends DuskTestCase
             // Just below lg (1024px)
             $browser->resize(1023, 768)
                 ->visit('/')
-                ->assertSee('Welcome to Community');
+                ->assertSee('최신 아티클');
 
             // At lg breakpoint
             $browser->resize(1024, 768)
                 ->visit('/')
-                ->assertSee('Welcome to Community');
+                ->assertSee('최신 아티클');
+        });
+    }
+
+    #[Test]
+    public function article_grid_responsive(): void
+    {
+        $this->browse(function (Browser $browser) {
+            // Desktop - 2 column grid
+            $browser->resize(1280, 800)
+                ->visit('/')
+                ->assertPresent('.grid.sm\\:grid-cols-2');
+
+            // Mobile - 1 column
+            $browser->resize(375, 812)
+                ->visit('/')
+                ->assertSee('PostgreSQL 18 성능 튜닝 완벽 가이드')
+                ->assertSee('Tailwind CSS 4 마이그레이션 가이드');
         });
     }
 }

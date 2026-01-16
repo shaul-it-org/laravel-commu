@@ -43,12 +43,28 @@
     };
 
     $classes = "$baseClasses $variantClasses $sizeClasses";
+
+    // Add disabled styles for anchor links
+    if ($href && $disabled) {
+        $classes .= ' pointer-events-none cursor-not-allowed opacity-50';
+    }
 @endphp
 
 @if($href)
-    <a href="{{ $href }}" {{ $attributes->merge(['class' => $classes]) }}>
-        {{ $slot }}
-    </a>
+    @if($disabled)
+        <a
+            role="button"
+            aria-disabled="true"
+            tabindex="-1"
+            {{ $attributes->merge(['class' => $classes]) }}
+        >
+            {{ $slot }}
+        </a>
+    @else
+        <a href="{{ $href }}" {{ $attributes->merge(['class' => $classes]) }}>
+            {{ $slot }}
+        </a>
+    @endif
 @else
     <button type="{{ $type }}" {{ $attributes->merge(['class' => $classes, 'disabled' => $disabled]) }}>
         {{ $slot }}
