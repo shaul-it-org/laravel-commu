@@ -19,7 +19,7 @@
 | 3 | DSN 발급 (Frontend) | | 완료 | Backend DSN 공유 |
 | 4 | 알림 채널 설정 | | 대기 | Sentry 대시보드 |
 | 5 | 알림 규칙 설정 | | 대기 | Sentry 대시보드 |
-| 6 | 환경별 설정 분리 | | 완료 | .env.*.example |
+| 6 | 환경별 설정 분리 | | 완료 | .env.develop/production.example |
 
 ## 상세 내용
 
@@ -68,8 +68,8 @@ environment:production
 
 | 환경 | 파일 | 설정 |
 |------|------|------|
-| local | `.env` | PII 전송, 샘플링 100% |
-| staging | `.env.staging.example` | PII 전송, 샘플링 100% |
+| local | `.env.example` | PII 전송, 샘플링 100% |
+| develop | `.env.develop.example` | PII 전송, 샘플링 100% |
 | production | `.env.production.example` | PII 비전송, 샘플링 조정 |
 
 **샘플링 설정:**
