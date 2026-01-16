@@ -19,9 +19,18 @@
 | Redis      | 캐시/세션/큐                |
 | MongoDB    | 도큐먼트 스토리지           |
 
+## Project Management
+
+| 도구 | URL | 용도 |
+|------|-----|------|
+| Jira | https://laravel-commu.atlassian.net/jira/software/projects/ECS/summary | 이슈/태스크 관리 |
+| Confluence | https://laravel-commu.atlassian.net/wiki/spaces/DOCS/overview | 문서 관리 |
+
 ## Notes
 
 - 상세 서버 스펙 및 URL: `.claude/COMPANY.local.md` 참조
 - CI/CD: Jenkins 파이프라인
 - 파일 스토리지: MinIO (S3 driver)
 - 에러 모니터링: Sentry (Laravel SDK)
+- 프로젝트 문서: Confluence DOCS 스페이스
+- 이슈 관리: Jira ECS 프로젝트
