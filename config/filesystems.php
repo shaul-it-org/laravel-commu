@@ -60,6 +60,19 @@ return [
             'report' => false,
         ],
 
+        'minio' => [
+            'driver' => 's3',
+            'key' => env('MINIO_ACCESS_KEY_ID', 'minioadmin'),
+            'secret' => env('MINIO_SECRET_ACCESS_KEY', 'minioadmin'),
+            'region' => 'us-east-1',
+            'bucket' => env('MINIO_BUCKET', 'laravel'),
+            'url' => env('MINIO_ENDPOINT'),
+            'endpoint' => env('MINIO_ENDPOINT'),
+            'use_path_style_endpoint' => env('MINIO_USE_PATH_STYLE_ENDPOINT', true),
+            'throw' => false,
+            'report' => false,
+        ],
+
     ],
 
     /*

@@ -27,12 +27,13 @@ RUN docker-php-ext-install -j$(nproc) \
 # ==========================================
 # PECL 확장 설치
 # - redis: 캐시, 세션, 큐 드라이버
+# - mongodb: MongoDB 연결
 # - xdebug: 디버깅 (IDE 연동)
 # - excimer: Sentry 프로파일링
 # ==========================================
-RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS linux-headers \
-    && pecl install redis xdebug excimer \
-    && docker-php-ext-enable redis xdebug excimer \
+RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS linux-headers openssl-dev \
+    && pecl install redis mongodb xdebug excimer \
+    && docker-php-ext-enable redis mongodb xdebug excimer \
     && apk del .build-deps
 
 COPY xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini

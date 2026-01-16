@@ -18,6 +18,8 @@ services:
       DB_PORT: 5432
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      MONGODB_URI: mongodb://${MONGODB_ROOT_USERNAME:-root}:${MONGODB_ROOT_PASSWORD:-root}@mongodb:27017
+      MINIO_ENDPOINT: http://minio:9000
       XDEBUG_MODE: ${XDEBUG_MODE:-off}
     ports:
       - "${WAS_PORT:-9002}:9000"
@@ -33,6 +35,10 @@ services:
       postgres:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      minio:
         condition: service_healthy
 
   # ==========================================
