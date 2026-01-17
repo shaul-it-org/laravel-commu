@@ -148,8 +148,29 @@
                     <template x-if="comment.is_deleted">
                         <p class="italic text-neutral-400">삭제된 댓글입니다.</p>
                     </template>
-                    <template x-if="!comment.is_deleted">
+                    <template x-if="!comment.is_deleted && editingComment?.id !== comment.id">
                         <p class="whitespace-pre-wrap text-neutral-700" x-text="comment.content"></p>
+                    </template>
+                    {{-- Edit Form --}}
+                    <template x-if="!comment.is_deleted && editingComment?.id === comment.id">
+                        <form @submit.prevent="updateComment(comment)" class="space-y-3">
+                            <textarea
+                                x-model="editContent"
+                                rows="3"
+                                class="input w-full resize-none"
+                                maxlength="1000"
+                            ></textarea>
+                            <div class="flex justify-end gap-2">
+                                <button type="button" @click="cancelEdit()" class="btn-outline text-sm">취소</button>
+                                <button
+                                    type="submit"
+                                    class="btn-primary text-sm"
+                                    :disabled="!editContent.trim() || submitting"
+                                >
+                                    수정
+                                </button>
+                            </div>
+                        </form>
                     </template>
                 </div>
 
@@ -299,6 +320,7 @@ function commentSection(articleSlug) {
         replyContent: '',
         replyingTo: null,
         editingComment: null,
+        editContent: '',
         sortBy: 'latest',
         loading: true,
         loadingMore: false,
@@ -317,7 +339,11 @@ function commentSection(articleSlug) {
 
             try {
                 const sort = this.sortBy === 'popular' ? 'popular' : 'latest';
-                const response = await fetch(`/api/articles/${this.articleSlug}/comments?page=${page}&sort=${sort}`);
+                const url = `/api/articles/${this.articleSlug}/comments?page=${page}&sort=${sort}`;
+                // 로그인 사용자는 인증 토큰 포함하여 요청 (is_mine 필드 정확히 반환받기 위함)
+                const response = this.isAuthenticated
+                    ? await window.auth.fetch(url)
+                    : await fetch(url);
 
                 if (!response.ok) {
                     console.warn('Comments API returned:', response.status);
@@ -422,7 +448,38 @@ function commentSection(articleSlug) {
 
         editComment(comment) {
             this.editingComment = comment;
-            // TODO: Implement edit modal
+            this.editContent = comment.content;
+        },
+
+        cancelEdit() {
+            this.editingComment = null;
+            this.editContent = '';
+        },
+
+        async updateComment(comment) {
+            if (!this.editContent.trim() || this.submitting) return;
+
+            this.submitting = true;
+            try {
+                const response = await window.auth.fetch(`/api/comments/${comment.id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ content: this.editContent })
+                });
+
+                if (response.ok) {
+                    comment.content = this.editContent;
+                    this.cancelEdit();
+                } else {
+                    const error = await response.json();
+                    alert(error.message || '댓글 수정에 실패했습니다.');
+                }
+            } catch (error) {
+                if (error.status === 401) return; // Already handled by auth.fetch
+                console.error('Failed to update comment:', error);
+                alert('댓글 수정에 실패했습니다.');
+            } finally {
+                this.submitting = false;
+            }
         },
 
         async deleteComment(commentId) {
