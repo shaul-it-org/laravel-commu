@@ -34,7 +34,7 @@ pipeline {
         GIT_CREDENTIALS_ID = 'home-server-deploy'
 
         // Jenkins Config File ID (.env 파일)
-        ENV_CONFIG_FILE_ID = 'laravel-commu-env-prod'
+        ENV_CONFIG_FILE_ID = 'commu-env-prod'
 
         // Storage 경로 (blue/green 공유)
         STORAGE_PATH = '/var/www/laravel-commu-storage'
