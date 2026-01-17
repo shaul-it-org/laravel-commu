@@ -138,7 +138,28 @@ pipeline {
             }
             steps {
                 script {
-                    // Git 작업을 위해 alpine/git 컨테이너 사용 (--entrypoint로 쉘 실행)
+                    // 배포 디렉토리 생성
+                    sh "mkdir -p ${DEPLOY_PATH}"
+
+                    // Git 저장소 존재 여부 확인
+                    def gitExists = sh(
+                        script: "docker run --rm -v ${DEPLOY_PATH}:${DEPLOY_PATH} -w ${DEPLOY_PATH} alpine:latest test -d .git && echo 'yes' || echo 'no'",
+                        returnStdout: true
+                    ).trim()
+
+                    if (gitExists == 'no') {
+                        // 최초 배포: 저장소 클론
+                        echo "Initial deployment: Cloning repository..."
+                        sh """
+                            docker run --rm \
+                                -v ${DEPLOY_PATH}:${DEPLOY_PATH} \
+                                -v /root/.ssh:/root/.ssh:ro \
+                                alpine/git:latest \
+                                clone ${GIT_REPO} ${DEPLOY_PATH}
+                        """
+                    }
+
+                    // Git pull (--entrypoint로 쉘 실행)
                     sh """
                         docker run --rm \
                             --entrypoint sh \
