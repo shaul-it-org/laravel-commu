@@ -49,7 +49,30 @@ $table->uuid('user_id')->comment('users 테이블의 id 참조');
 ```
 
 #### SoftDeletes 필수 사용
-모든 테이블에 `SoftDeletes`를 적용한다.
+모든 테이블과 Model에 `SoftDeletes`를 적용한다.
+
+**Migration:**
+```php
+$table->softDeletes();
+```
+
+**Model:**
+```php
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Post extends Model
+{
+    use SoftDeletes;
+
+    protected function casts(): array
+    {
+        return [
+            // ... 기타 casts
+            'deleted_at' => 'datetime',
+        ];
+    }
+}
+```
 
 **예외**: pivot tables, log/history 테이블, 임시 데이터 테이블
 
