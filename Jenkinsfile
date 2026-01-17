@@ -138,14 +138,15 @@ pipeline {
             }
             steps {
                 script {
-                    // Git 작업을 위해 alpine/git 컨테이너 사용
+                    // Git 작업을 위해 alpine/git 컨테이너 사용 (--entrypoint로 쉘 실행)
                     sh """
                         docker run --rm \
+                            --entrypoint sh \
                             -v ${DEPLOY_PATH}:${DEPLOY_PATH} \
                             -v /root/.ssh:/root/.ssh:ro \
                             -w ${DEPLOY_PATH} \
                             alpine/git:latest \
-                            sh -c "git config --global --add safe.directory ${DEPLOY_PATH} && git fetch origin && git checkout ${params.BRANCH} && git pull origin ${params.BRANCH}"
+                            -c "git config --global --add safe.directory ${DEPLOY_PATH} && git fetch origin && git checkout ${params.BRANCH} && git pull origin ${params.BRANCH}"
                     """
 
                     // 배포 버전 기록
