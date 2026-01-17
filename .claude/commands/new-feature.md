@@ -284,8 +284,34 @@ flowchart LR
     DevOps --> QA{Phase 5\nQA + E2E}
     QA -->|버그 발견| Dev
     QA -->|통과| Docs[Phase 6\nDocs]
-    Docs --> Merge[Merge\n& Push]
+    Docs --> PR[PR 생성\n& Merge]
 ```
+
+> ⚠️ **필수 규칙**: 직접 git push 금지. 모든 변경사항은 반드시 PR을 통해 머지.
+
+### Phase 7: PR 생성 및 머지
+모든 작업 완료 후 PR을 생성하여 머지한다:
+
+```bash
+# 1. 원격 브랜치로 push
+git push -u origin feature/$1
+
+# 2. PR 생성 (필수)
+gh pr create --title "feat(ECS-XX): $1 - $2" --body "## Summary
+- 기능 설명
+
+## Related
+- Jira Epic: ECS-XX
+- Confluence: [PRD 링크]
+
+## Test
+- [ ] 단위 테스트 통과
+- [ ] E2E 테스트 통과"
+
+# 3. PR 리뷰 후 머지
+```
+
+**⚠️ 직접 master push 금지**: 반드시 PR을 통해서만 머지
 
 ## Git Commit 규칙
 
@@ -349,7 +375,7 @@ Jira: ECS-XX
     - 통과 시: Phase 6으로 진행
     - 버그 발견 시: Jira 티켓 생성 → Phase 3으로 돌아가 수정
 11. **Docs Agent** → 인증 문서 정리
-12. **Git** → Merge & Push
+12. **PR 생성 및 머지** → `gh pr create` → 리뷰 후 머지
 
 ### Backend TDD 예시 코드 (Pest)
 ```php

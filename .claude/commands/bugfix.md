@@ -166,8 +166,14 @@ QA 팀이 버그 수정을 검증한다:
 
 2. **검증 성공 시**
    - `jira_transition_issue`: "완료"(41)로 변경
-   - PR 생성 (필요 시)
-   - 브랜치 머지
+   - **PR 생성 (필수)**
+     ```bash
+     git push -u origin bugfix/ECS-XX
+     gh pr create --title "fix(ECS-XX): 버그 수정 요약" --body "## Summary\n- 수정 내용"
+     ```
+   - PR 리뷰 후 머지
+
+> ⚠️ **직접 push 금지**: master 브랜치에 직접 push하지 않음. 반드시 PR을 통해 머지.
 
 ## MCP Tools
 
