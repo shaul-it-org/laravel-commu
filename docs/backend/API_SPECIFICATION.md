@@ -941,7 +941,7 @@ Authorization: Bearer {token}
 
 ### 6.7 연결된 소셜 계정 목록
 ```
-GET /api/v1/settings/social-accounts
+GET /api/auth/social-accounts
 Authorization: Bearer {token}
 ```
 
@@ -949,27 +949,73 @@ Authorization: Bearer {token}
 ```json
 {
   "success": true,
-  "data": [
-    {
-      "provider": "google",
-      "email": "user@gmail.com",
-      "connected_at": "2024-01-01T00:00:00Z"
+  "data": {
+    "social_accounts": {
+      "github": {
+        "connected": true,
+        "provider_id": "12345678",
+        "nickname": "devkim",
+        "email": "devkim@github.com",
+        "avatar": "https://avatars.githubusercontent.com/u/12345678",
+        "connected_at": "2024-01-05T00:00:00Z"
+      },
+      "google": {
+        "connected": false
+      }
     },
-    {
-      "provider": "github",
-      "username": "devkim",
-      "connected_at": "2024-01-05T00:00:00Z"
+    "can_unlink": {
+      "github": true,
+      "google": false
     }
-  ]
+  }
 }
 ```
+
+**Notes:**
+- `can_unlink`: 해당 소셜 계정을 연동 해제할 수 있는지 여부
+- 비밀번호가 없고 소셜 계정이 1개뿐이면 마지막 인증 수단이므로 연동 해제 불가
 
 ---
 
 ### 6.8 소셜 계정 연결 해제
 ```
-DELETE /api/v1/settings/social-accounts/{provider}
+DELETE /api/auth/social-accounts/{provider}
 Authorization: Bearer {token}
+```
+
+**Path Parameters:**
+- `provider`: 연동 해제할 소셜 계정 제공자 (github, google)
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "data": {
+    "message": "소셜 계정 연동이 해제되었습니다."
+  }
+}
+```
+
+**Error Response (400 Bad Request):**
+```json
+{
+  "success": false,
+  "error": {
+    "code": "CANNOT_UNLINK_LAST_AUTH",
+    "message": "마지막 인증 수단은 연동 해제할 수 없습니다. 먼저 비밀번호를 설정하거나 다른 소셜 계정을 연동하세요."
+  }
+}
+```
+
+**Error Response (404 Not Found):**
+```json
+{
+  "success": false,
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "연동된 소셜 계정을 찾을 수 없습니다."
+  }
+}
 ```
 
 ---
