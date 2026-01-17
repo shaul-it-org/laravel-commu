@@ -124,6 +124,7 @@
                                 x-show="comment.is_mine"
                                 @click="editComment(comment); open = false"
                                 class="block w-full px-4 py-2 text-left text-sm text-neutral-700 hover:bg-neutral-100"
+                                :dusk="'comment-edit-' + comment.id"
                             >
                                 수정
                             </button>
@@ -131,6 +132,7 @@
                                 x-show="comment.is_mine"
                                 @click="deleteComment(comment.id); open = false"
                                 class="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+                                :dusk="'comment-delete-' + comment.id"
                             >
                                 삭제
                             </button>
@@ -138,6 +140,7 @@
                                 x-show="!comment.is_mine"
                                 @click="open = false"
                                 class="block w-full px-4 py-2 text-left text-sm text-neutral-700 hover:bg-neutral-100"
+                                :dusk="'comment-report-' + comment.id"
                             >
                                 신고
                             </button>
@@ -207,6 +210,7 @@
                                 type="submit"
                                 class="btn-primary text-sm"
                                 :disabled="!replyContent.trim() || submitting"
+                                :dusk="'comment-reply-submit-' + comment.id"
                             >
                                 답글 작성
                             </button>
