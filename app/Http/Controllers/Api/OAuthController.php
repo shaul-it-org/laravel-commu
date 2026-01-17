@@ -9,6 +9,7 @@ use App\Infrastructure\Persistence\Eloquent\SocialAccountModel;
 use App\Infrastructure\Persistence\Eloquent\UserModel;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -19,7 +20,7 @@ final class OAuthController extends Controller
 {
     private const SUPPORTED_PROVIDERS = ['google', 'github'];
 
-    public function redirect(string $provider): JsonResponse
+    public function redirect(string $provider): RedirectResponse|JsonResponse
     {
         if (! in_array($provider, self::SUPPORTED_PROVIDERS, true)) {
             return response()->json([
@@ -27,13 +28,7 @@ final class OAuthController extends Controller
             ], 422);
         }
 
-        $url = Socialite::driver($provider)->stateless()->redirect()->getTargetUrl();
-
-        return response()->json([
-            'data' => [
-                'url' => $url,
-            ],
-        ]);
+        return Socialite::driver($provider)->stateless()->redirect();
     }
 
     public function callback(Request $request, string $provider): JsonResponse
