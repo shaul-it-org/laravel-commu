@@ -68,6 +68,27 @@ composer hooks:install
 - **Storage**: MinIO (docker, S3 호환)
 - **Frontend**: Vite + Tailwind CSS, 엔트리포인트는 `resources/css/app.css`, `resources/js/app.js`
 
+## Skill 사용 규칙
+
+### /new-feature, /bugfix 스킬
+
+`/new-feature` 또는 `/bugfix` 스킬 사용 시 **반드시 git worktree로 새 브랜치를 생성**하여 작업해야 합니다.
+
+**이유**: 병렬 작업 시 다른 브랜치에 영향을 주지 않기 위함
+
+**절차**:
+1. worktree 디렉토리 존재 여부 확인
+2. git worktree로 새 브랜치 생성
+3. 해당 worktree 디렉토리에서 작업 수행
+
+```bash
+# /new-feature 예시
+git worktree add -b feature/ECS-xxx ../laravel-commu-worktrees/feature-ECS-xxx master
+
+# /bugfix 예시
+git worktree add -b bugfix/ECS-xxx ../laravel-commu-worktrees/bugfix-ECS-xxx master
+```
+
 ## Git Worktree
 
 ### Git Worktree란?
