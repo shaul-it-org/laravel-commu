@@ -286,10 +286,11 @@ pipeline {
                     def retryCount = 0
                     def healthy = false
 
+                    // Jenkins가 Docker 컨테이너에서 실행되므로 docker exec로 내부에서 health check
                     while (retryCount < maxRetries && !healthy) {
                         sleep(2)
                         def status = sh(
-                            script: "curl -sf http://localhost:${TARGET_PORT}/up || echo 'unhealthy'",
+                            script: "docker exec ${PROJECT_NAME}-${TARGET_ENV} curl -sf http://localhost/up || echo 'unhealthy'",
                             returnStdout: true
                         ).trim()
 
@@ -303,6 +304,8 @@ pipeline {
                     }
 
                     if (!healthy) {
+                        // 실패 시 컨테이너 로그 출력
+                        sh "docker logs --tail 50 ${PROJECT_NAME}-${TARGET_ENV} || true"
                         error("Health check failed after ${maxRetries} attempts")
                     }
                 }
