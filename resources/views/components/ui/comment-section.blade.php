@@ -10,15 +10,14 @@
 <section
     class="mt-12"
     x-data="commentSection('{{ $articleSlug }}')"
-    x-init="fetchComments()"
+    x-init="init()"
 >
     <h2 class="mb-6 text-xl font-bold text-neutral-900">
         댓글 <span class="text-neutral-500" x-text="'(' + (meta?.total || 0) + ')'"></span>
     </h2>
 
-    {{-- Comment Form --}}
-    @auth
-    <form @submit.prevent="submitComment()" class="mb-8">
+    {{-- Comment Form (로그인 사용자) --}}
+    <form x-show="isAuthenticated" @submit.prevent="submitComment()" class="mb-8" x-cloak>
         <div class="rounded-xl border border-neutral-200 bg-white p-4">
             <textarea
                 x-model="newComment"
@@ -49,12 +48,12 @@
             </div>
         </div>
     </form>
-    @else
-    <div class="mb-8 rounded-xl border border-neutral-200 bg-neutral-50 p-6 text-center">
+
+    {{-- Login Prompt (비로그인 사용자) --}}
+    <div x-show="!isAuthenticated" class="mb-8 rounded-xl border border-neutral-200 bg-neutral-50 p-6 text-center" x-cloak>
         <p class="text-neutral-600">댓글을 작성하려면 로그인이 필요합니다.</p>
         <a href="{{ route('login') }}" class="btn-primary mt-3 inline-block">로그인</a>
     </div>
-    @endauth
 
     {{-- Sort Options --}}
     <div class="mb-4 flex items-center gap-4">
@@ -111,9 +110,8 @@
                         </div>
                     </div>
 
-                    {{-- Actions Dropdown --}}
-                    @auth
-                    <div class="relative" x-data="{ open: false }">
+                    {{-- Actions Dropdown (로그인 사용자만) --}}
+                    <div x-show="isAuthenticated" class="relative" x-data="{ open: false }" x-cloak>
                         <button @click="open = !open" class="rounded p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
@@ -143,7 +141,6 @@
                             </button>
                         </div>
                     </div>
-                    @endauth
                 </div>
 
                 {{-- Comment Content --}}
@@ -158,39 +155,43 @@
 
                 {{-- Comment Actions --}}
                 <div class="mt-4 flex items-center gap-4" x-show="!comment.is_deleted">
-                    @auth
-                    <button
-                        @click="toggleLike(comment)"
-                        class="flex items-center gap-1 text-sm transition-colors"
-                        :class="comment.is_liked ? 'text-red-500' : 'text-neutral-500 hover:text-red-500'"
-                    >
-                        <svg class="h-4 w-4" :fill="comment.is_liked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                        <span x-text="comment.like_count"></span>
-                    </button>
-                    <button
-                        @click="startReply(comment)"
-                        class="flex items-center gap-1 text-sm text-neutral-500 transition-colors hover:text-primary-600"
-                    >
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-                        </svg>
-                        답글
-                    </button>
-                    @else
-                    <span class="flex items-center gap-1 text-sm text-neutral-500">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                        <span x-text="comment.like_count"></span>
-                    </span>
-                    @endauth
+                    {{-- 로그인 사용자: 좋아요/답글 버튼 --}}
+                    <template x-if="isAuthenticated">
+                        <div class="flex items-center gap-4">
+                            <button
+                                @click="toggleLike(comment)"
+                                class="flex items-center gap-1 text-sm transition-colors"
+                                :class="comment.is_liked ? 'text-red-500' : 'text-neutral-500 hover:text-red-500'"
+                            >
+                                <svg class="h-4 w-4" :fill="comment.is_liked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                                <span x-text="comment.like_count"></span>
+                            </button>
+                            <button
+                                @click="startReply(comment)"
+                                class="flex items-center gap-1 text-sm text-neutral-500 transition-colors hover:text-primary-600"
+                            >
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                                </svg>
+                                답글
+                            </button>
+                        </div>
+                    </template>
+                    {{-- 비로그인 사용자: 좋아요 수만 표시 --}}
+                    <template x-if="!isAuthenticated">
+                        <span class="flex items-center gap-1 text-sm text-neutral-500">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                            <span x-text="comment.like_count"></span>
+                        </span>
+                    </template>
                 </div>
 
-                {{-- Reply Form --}}
-                @auth
-                <div x-show="replyingTo === comment.id" class="mt-4 border-t border-neutral-100 pt-4">
+                {{-- Reply Form (로그인 사용자만) --}}
+                <div x-show="isAuthenticated && replyingTo === comment.id" class="mt-4 border-t border-neutral-100 pt-4" x-cloak>
                     <form @submit.prevent="submitReply(comment.id)">
                         <textarea
                             x-model="replyContent"
@@ -211,7 +212,6 @@
                         </div>
                     </form>
                 </div>
-                @endauth
 
                 {{-- Replies --}}
                 <div x-show="comment.replies && comment.replies.length > 0" class="mt-4 space-y-4 border-l-2 border-neutral-100 pl-4">
@@ -242,25 +242,28 @@
                                 </template>
                             </div>
                             <div class="mt-2 flex items-center gap-4" x-show="!reply.is_deleted">
-                                @auth
-                                <button
-                                    @click="toggleLike(reply)"
-                                    class="flex items-center gap-1 text-xs transition-colors"
-                                    :class="reply.is_liked ? 'text-red-500' : 'text-neutral-500 hover:text-red-500'"
-                                >
-                                    <svg class="h-3.5 w-3.5" :fill="reply.is_liked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                    </svg>
-                                    <span x-text="reply.like_count"></span>
-                                </button>
-                                @else
-                                <span class="flex items-center gap-1 text-xs text-neutral-500">
-                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                    </svg>
-                                    <span x-text="reply.like_count"></span>
-                                </span>
-                                @endauth
+                                {{-- 로그인 사용자: 답글 좋아요 버튼 --}}
+                                <template x-if="isAuthenticated">
+                                    <button
+                                        @click="toggleLike(reply)"
+                                        class="flex items-center gap-1 text-xs transition-colors"
+                                        :class="reply.is_liked ? 'text-red-500' : 'text-neutral-500 hover:text-red-500'"
+                                    >
+                                        <svg class="h-3.5 w-3.5" :fill="reply.is_liked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                        </svg>
+                                        <span x-text="reply.like_count"></span>
+                                    </button>
+                                </template>
+                                {{-- 비로그인 사용자: 답글 좋아요 수만 표시 --}}
+                                <template x-if="!isAuthenticated">
+                                    <span class="flex items-center gap-1 text-xs text-neutral-500">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                        </svg>
+                                        <span x-text="reply.like_count"></span>
+                                    </span>
+                                </template>
                             </div>
                         </div>
                     </template>
@@ -300,6 +303,13 @@ function commentSection(articleSlug) {
         loading: true,
         loadingMore: false,
         submitting: false,
+        isAuthenticated: false,
+
+        init() {
+            // 클라이언트 사이드에서 인증 상태 확인
+            this.isAuthenticated = window.auth?.isAuthenticated() || false;
+            this.fetchComments();
+        },
 
         async fetchComments(page = 1) {
             if (page === 1) this.loading = true;
