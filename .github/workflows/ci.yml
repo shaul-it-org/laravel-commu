@@ -1,4 +1,5 @@
 name: CI
+# Auto-deploy test: 2026-01-18
 
 on:
   push:
