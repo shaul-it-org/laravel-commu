@@ -15,12 +15,12 @@ final class OAuthTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_소셜_로그인_리다이렉트_ur_l을_반환한다(): void
+    public function test_소셜_로그인_리다이렉트를_수행한다(): void
     {
-        $response = $this->getJson('/api/auth/oauth/google/redirect');
+        $response = $this->get('/api/auth/oauth/google/redirect');
 
-        $response->assertOk()
-            ->assertJsonStructure(['data' => ['url']]);
+        $response->assertRedirect();
+        $this->assertStringContainsString('accounts.google.com', $response->headers->get('Location'));
     }
 
     public function test_지원하지_않는_프로바이더는_에러를_반환한다(): void
@@ -31,12 +31,12 @@ final class OAuthTest extends TestCase
             ->assertJsonPath('message', 'Unsupported OAuth provider');
     }
 
-    public function test_git_hub_소셜_로그인_리다이렉트_ur_l을_반환한다(): void
+    public function test_git_hub_소셜_로그인_리다이렉트를_수행한다(): void
     {
-        $response = $this->getJson('/api/auth/oauth/github/redirect');
+        $response = $this->get('/api/auth/oauth/github/redirect');
 
-        $response->assertOk()
-            ->assertJsonStructure(['data' => ['url']]);
+        $response->assertRedirect();
+        $this->assertStringContainsString('github.com', $response->headers->get('Location'));
     }
 
     public function test_새_사용자가_소셜_로그인으로_가입할_수_있다(): void
