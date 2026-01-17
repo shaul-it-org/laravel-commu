@@ -8,6 +8,23 @@ const AUTH_USER_KEY = 'auth_user';
 
 export const auth = {
     /**
+     * Ensure CSRF token is set by calling Sanctum's csrf-cookie endpoint
+     */
+    async ensureCsrfToken() {
+        await fetch('/sanctum/csrf-cookie', {
+            credentials: 'same-origin',
+        });
+    },
+
+    /**
+     * Get CSRF token from cookie
+     */
+    getCsrfToken() {
+        const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+        return match ? decodeURIComponent(match[1]) : null;
+    },
+
+    /**
      * Get stored auth token
      */
     getToken() {
@@ -55,12 +72,22 @@ export const auth = {
      * Login user
      */
     async login(email, password, remember = false) {
+        // Ensure CSRF token is set for Sanctum SPA authentication
+        await this.ensureCsrfToken();
+
+        const headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        };
+
+        const csrfToken = this.getCsrfToken();
+        if (csrfToken) {
+            headers['X-XSRF-TOKEN'] = csrfToken;
+        }
+
         const response = await fetch('/api/auth/login', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
+            headers,
             credentials: 'same-origin',
             body: JSON.stringify({ email, password, remember }),
         });
@@ -81,12 +108,22 @@ export const auth = {
      * Register user
      */
     async register(userData) {
+        // Ensure CSRF token is set for Sanctum SPA authentication
+        await this.ensureCsrfToken();
+
+        const headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        };
+
+        const csrfToken = this.getCsrfToken();
+        if (csrfToken) {
+            headers['X-XSRF-TOKEN'] = csrfToken;
+        }
+
         const response = await fetch('/api/auth/register', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
+            headers,
             credentials: 'same-origin',
             body: JSON.stringify(userData),
         });

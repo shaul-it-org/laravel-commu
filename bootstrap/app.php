@@ -22,6 +22,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             EnsureFrontendRequestsAreStateful::class,
         ]);
+
+        // API 인증 라우트는 CSRF 검증에서 제외 (토큰 기반 인증 사용)
+        $middleware->validateCsrfTokens(except: [
+            'api/auth/login',
+            'api/auth/register',
+            'api/auth/logout',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Sentry 통합 - BaseException context를 Sentry에 전달
