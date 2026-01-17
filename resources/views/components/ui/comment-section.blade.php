@@ -345,13 +345,8 @@ function commentSection(articleSlug) {
 
             this.submitting = true;
             try {
-                const response = await fetch(`/api/articles/${this.articleSlug}/comments`, {
+                const response = await window.auth.fetch(`/api/articles/${this.articleSlug}/comments`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
                     body: JSON.stringify({ content: this.newComment })
                 });
 
@@ -363,6 +358,7 @@ function commentSection(articleSlug) {
                     alert(error.message || '댓글 작성에 실패했습니다.');
                 }
             } catch (error) {
+                if (error.status === 401) return; // Already handled by auth.fetch
                 console.error('Failed to submit comment:', error);
                 alert('댓글 작성에 실패했습니다.');
             } finally {
@@ -385,13 +381,8 @@ function commentSection(articleSlug) {
 
             this.submitting = true;
             try {
-                const response = await fetch(`/api/comments/${commentId}/replies`, {
+                const response = await window.auth.fetch(`/api/comments/${commentId}/replies`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
                     body: JSON.stringify({ content: this.replyContent })
                 });
 
@@ -404,6 +395,7 @@ function commentSection(articleSlug) {
                     alert(error.message || '답글 작성에 실패했습니다.');
                 }
             } catch (error) {
+                if (error.status === 401) return; // Already handled by auth.fetch
                 console.error('Failed to submit reply:', error);
                 alert('답글 작성에 실패했습니다.');
             } finally {
@@ -413,12 +405,8 @@ function commentSection(articleSlug) {
 
         async toggleLike(comment) {
             try {
-                const response = await fetch(`/api/comments/${comment.id}/like`, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    }
+                const response = await window.auth.fetch(`/api/comments/${comment.id}/like`, {
+                    method: 'POST'
                 });
 
                 if (response.ok) {
@@ -427,6 +415,7 @@ function commentSection(articleSlug) {
                     comment.like_count = data.data.like_count;
                 }
             } catch (error) {
+                if (error.status === 401) return; // Already handled by auth.fetch
                 console.error('Failed to toggle like:', error);
             }
         },
@@ -440,12 +429,8 @@ function commentSection(articleSlug) {
             if (!confirm('정말 이 댓글을 삭제하시겠습니까?')) return;
 
             try {
-                const response = await fetch(`/api/comments/${commentId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    }
+                const response = await window.auth.fetch(`/api/comments/${commentId}`, {
+                    method: 'DELETE'
                 });
 
                 if (response.ok) {
@@ -455,6 +440,7 @@ function commentSection(articleSlug) {
                     alert(error.message || '댓글 삭제에 실패했습니다.');
                 }
             } catch (error) {
+                if (error.status === 401) return; // Already handled by auth.fetch
                 console.error('Failed to delete comment:', error);
                 alert('댓글 삭제에 실패했습니다.');
             }
