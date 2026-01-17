@@ -61,6 +61,7 @@ export const auth = {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
             },
+            credentials: 'same-origin',
             body: JSON.stringify({ email, password, remember }),
         });
 
@@ -86,6 +87,7 @@ export const auth = {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
             },
+            credentials: 'same-origin',
             body: JSON.stringify(userData),
         });
 
@@ -115,6 +117,7 @@ export const auth = {
                         'Authorization': `Bearer ${token}`,
                         'Accept': 'application/json',
                     },
+                    credentials: 'same-origin',
                 });
             } catch (e) {
                 // Ignore logout errors
@@ -140,6 +143,7 @@ export const auth = {
                     'Authorization': `Bearer ${token}`,
                     'Accept': 'application/json',
                 },
+                credentials: 'same-origin',
             });
 
             if (!response.ok) {

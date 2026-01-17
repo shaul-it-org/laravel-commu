@@ -39,7 +39,8 @@ Route::get('/@{username}', function (string $username) {
 })->name('profile.show');
 
 // Auth Required Routes (redirect to login if not authenticated)
-Route::middleware('auth')->group(function () {
+// auth:sanctum supports both session-based and token-based authentication
+Route::middleware('auth:sanctum')->group(function () {
     Route::get('/write', function () {
         return view('pages.articles.write');
     })->name('articles.create');
