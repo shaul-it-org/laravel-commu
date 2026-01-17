@@ -68,6 +68,54 @@ composer hooks:install
 - **Storage**: MinIO (docker, S3 호환)
 - **Frontend**: Vite + Tailwind CSS, 엔트리포인트는 `resources/css/app.css`, `resources/js/app.js`
 
+## Database 규칙 (PostgreSQL)
+
+### 약한 결합 (Soft Reference) 정책
+
+Foreign Key 제약조건을 사용하지 않고 **약한 결합** 방식으로 테이블 간 관계를 구성합니다.
+
+**이유**:
+- 마이크로서비스 전환 시 유연성 확보
+- 데이터 마이그레이션 용이
+- 삭제/수정 시 cascade 문제 방지
+- 데이터베이스 간 의존성 감소
+
+**Migration 작성 규칙**:
+
+```php
+// ❌ 사용하지 않음
+$table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+
+// ✅ 약한 결합 방식 사용
+$table->uuid('user_id')->comment('users 테이블의 id 참조');
+$table->unsignedBigInteger('category_id')->comment('categories 테이블의 id 참조');
+```
+
+### SoftDeletes 필수 사용
+
+모든 테이블에 `SoftDeletes`를 적용합니다.
+
+**예외 케이스** (SoftDeletes 미적용):
+- 중간 관계 테이블 (pivot tables)
+- 로그 테이블 (insert only)
+- 히스토리 테이블 (insert only)
+- 임시 데이터 테이블
+
+**Migration 작성**:
+
+```php
+// 일반 테이블
+$table->softDeletes();
+
+// Model에서 trait 사용
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Post extends Model
+{
+    use SoftDeletes;
+}
+```
+
 ## Skill 사용 규칙
 
 ### /new-feature, /bugfix 스킬
