@@ -120,27 +120,14 @@ class Post extends Model
 
 ### /new-feature, /bugfix 스킬
 
-`/new-feature` 또는 `/bugfix` 스킬 사용 시 **반드시 git worktree로 새 브랜치를 생성**하여 작업해야 합니다.
+상세 규칙은 각 스킬 파일 참조:
+- `.claude/commands/new-feature.md`
+- `.claude/commands/bugfix.md`
 
-**이유**: 병렬 작업 시 다른 브랜치에 영향을 주지 않기 위함
-
-**절차**:
-1. worktree 디렉토리 존재 여부 확인
-2. git worktree로 새 브랜치 생성
-3. 해당 worktree 디렉토리에서 작업 수행
-
-```bash
-# /new-feature 예시
-git worktree add -b feature/ECS-xxx ../laravel-commu-worktrees/feature-ECS-xxx master
-
-# /bugfix 예시
-git worktree add -b bugfix/ECS-xxx ../laravel-commu-worktrees/bugfix-ECS-xxx master
-```
-
-**Worktree 제거 시점**: PR이 머지된 후 제거 (리뷰/수정 요청 대비)
-```bash
-git worktree remove ../laravel-commu-worktrees/feature-ECS-xxx
-```
+**핵심 규칙**:
+- git worktree로 새 브랜치 생성하여 작업
+- **직접 git push 금지** - 반드시 PR을 통해 머지
+- Worktree 제거는 PR 머지 후
 
 ## Git Worktree
 
