@@ -249,6 +249,11 @@ pipeline {
                         docker exec ${PROJECT_NAME} php artisan view:cache || true
                         docker exec ${PROJECT_NAME} php artisan migrate --force || true
                     """
+
+                    // OAuth 키 권한 수정 (chmod -R 775 이후에 실행해야 함, Passport 보안 요구사항: 600/660)
+                    sh """
+                        docker exec ${PROJECT_NAME} sh -c 'if [ -f /var/www/html/storage/oauth-private.key ]; then chmod 600 /var/www/html/storage/oauth-private.key && chmod 660 /var/www/html/storage/oauth-public.key; fi' || true
+                    """
                 }
             }
         }
