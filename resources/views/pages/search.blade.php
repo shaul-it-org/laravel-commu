@@ -69,10 +69,10 @@
                     <span class="text-sm text-neutral-600">카테고리:</span>
                     <select x-model="category" @change="search()" class="input py-1.5 text-sm">
                         <option value="">전체</option>
-                        <option value="기술">기술</option>
-                        <option value="커리어">커리어</option>
-                        <option value="일상">일상</option>
-                        <option value="리뷰">리뷰</option>
+                        <option value="tech">기술</option>
+                        <option value="career">커리어</option>
+                        <option value="life">일상</option>
+                        <option value="news">뉴스</option>
                     </select>
                 </div>
             </div>
