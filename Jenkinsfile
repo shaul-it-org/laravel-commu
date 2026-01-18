@@ -164,7 +164,8 @@ pipeline {
                         """
                     }
 
-                    // Git pull (--entrypoint로 쉘 실행)
+                    // Git fetch & reset (--entrypoint로 쉘 실행)
+                    // 로컬 변경사항을 무시하고 원격 브랜치 상태로 강제 리셋
                     sh """
                         docker run --rm \
                             --entrypoint sh \
@@ -172,7 +173,7 @@ pipeline {
                             -v /root/.ssh:/root/.ssh:ro \
                             -w ${DEPLOY_PATH} \
                             alpine/git:latest \
-                            -c "git config --global --add safe.directory ${DEPLOY_PATH} && git fetch origin && git checkout ${params.BRANCH} && git pull origin ${params.BRANCH}"
+                            -c "git config --global --add safe.directory ${DEPLOY_PATH} && git fetch origin && git checkout -f ${params.BRANCH} && git reset --hard origin/${params.BRANCH}"
                     """
 
                     // 배포 버전 기록
