@@ -307,7 +307,7 @@ jobs:
                         "emoji": true
                       },
                       "style": "primary",
-                      "url": "${{ secrets.JENKINS_URL }}/job/${{ env.JENKINS_JOB_NAME }}/build?token=${{ secrets.JENKINS_BUILD_TOKEN }}"
+                      "url": "${{ secrets.JENKINS_URL }}/job/blogs/job/${{ env.JENKINS_JOB_NAME }}/build?token=${{ secrets.JENKINS_BUILD_TOKEN }}"
                     },
                     {
                       "type": "button",
@@ -316,7 +316,7 @@ jobs:
                         "text": "Jenkins 열기",
                         "emoji": true
                       },
-                      "url": "${{ secrets.JENKINS_URL }}/job/${{ env.JENKINS_JOB_NAME }}"
+                      "url": "${{ secrets.JENKINS_URL }}/job/blogs/job/${{ env.JENKINS_JOB_NAME }}/"
                     },
                     {
                       "type": "button",
