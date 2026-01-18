@@ -262,9 +262,14 @@ pipeline {
                             docker compose -f docker/docker-compose.prod.yml up -d ${TARGET_ENV}
                     """
 
-                    // Laravel 캐시 생성 (컨테이너 내에서 실행)
+                    // OAuth 키 권한 수정 (www-data가 읽을 수 있도록)
                     sh """
                         sleep 5
+                        docker exec ${PROJECT_NAME}-${TARGET_ENV} sh -c 'if [ -f /var/www/html/storage/oauth-private.key ]; then chown www-data:www-data /var/www/html/storage/oauth-private.key /var/www/html/storage/oauth-public.key && chmod 600 /var/www/html/storage/oauth-private.key && chmod 644 /var/www/html/storage/oauth-public.key; fi' || true
+                    """
+
+                    // Laravel 캐시 생성 (컨테이너 내에서 실행)
+                    sh """
                         docker exec ${PROJECT_NAME}-${TARGET_ENV} php artisan config:cache || true
                         docker exec ${PROJECT_NAME}-${TARGET_ENV} php artisan route:cache || true
                         docker exec ${PROJECT_NAME}-${TARGET_ENV} php artisan view:cache || true
