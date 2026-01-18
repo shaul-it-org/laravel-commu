@@ -42,6 +42,16 @@ final class OAuthController extends Controller
         try {
             $socialUser = Socialite::driver($provider)->stateless()->user();
 
+            // Check if user was previously deleted (soft deleted)
+            $deletedUser = UserModel::withTrashed()
+                ->where('email', $socialUser->getEmail())
+                ->whereNotNull('deleted_at')
+                ->first();
+
+            if ($deletedUser) {
+                return redirect('/login?error=account_deleted');
+            }
+
             $user = DB::transaction(function () use ($provider, $socialUser) {
                 // Step 1: Check if social account exists
                 $socialAccount = SocialAccountModel::where('provider', $provider)
