@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -101,8 +102,25 @@ final class OAuthController extends Controller
                 return $user;
             });
 
-            // Create token (Passport)
-            $token = $user->createToken('oauth-token')->accessToken;
+            // Create Access Token (Passport)
+            $tokenResult = $user->createToken('access_token');
+            $accessToken = $tokenResult->accessToken;
+
+            // Create Refresh Token and set as HTTP-only cookie
+            $refreshTokenResult = $user->createToken('refresh_token');
+            $refreshExpiresInMinutes = (int) config('passport.refresh_tokens_expire_in', 10080);
+
+            $refreshTokenCookie = Cookie::make(
+                name: 'refresh_token',
+                value: $refreshTokenResult->accessToken,
+                minutes: $refreshExpiresInMinutes,
+                path: '/api/auth',
+                domain: null,
+                secure: app()->environment('production'),
+                httpOnly: true,
+                raw: false,
+                sameSite: 'lax'
+            );
 
             // Return HTML that stores token and redirects
             $userData = json_encode([
@@ -123,7 +141,7 @@ final class OAuthController extends Controller
 </head>
 <body>
     <script>
-        localStorage.setItem('auth_token', '{$token}');
+        localStorage.setItem('auth_token', '{$accessToken}');
         localStorage.setItem('auth_user', '{$userData}');
         window.location.href = '/';
     </script>
@@ -131,7 +149,7 @@ final class OAuthController extends Controller
 </html>
 HTML;
 
-            return response($html)->header('Content-Type', 'text/html');
+            return response($html)->header('Content-Type', 'text/html')->withCookie($refreshTokenCookie);
         } catch (\Exception $e) {
             \Log::error('OAuth callback error', [
                 'provider' => $provider,
