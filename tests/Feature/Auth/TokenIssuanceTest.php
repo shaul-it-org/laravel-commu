@@ -36,7 +36,9 @@ describe('Token Issuance API', function () {
 
         // Access Token 확인
         expect($response->json('token_type'))->toBe('Bearer');
-        expect($response->json('expires_in'))->toBe(900); // 15분 = 900초
+        // 15분 = 900초 (토큰 생성 후 응답까지 약간의 시간 차이 허용)
+        expect($response->json('expires_in'))->toBeGreaterThanOrEqual(895);
+        expect($response->json('expires_in'))->toBeLessThanOrEqual(900);
 
         // Refresh Token은 HTTP-only Cookie로 전달
         $response->assertCookie('refresh_token');
@@ -117,7 +119,8 @@ describe('Token Expiration', function () {
 
         $response->assertStatus(200);
 
-        // 15분 = 900초
-        expect($response->json('expires_in'))->toBe(900);
+        // 15분 = 900초 (토큰 생성 후 응답까지 약간의 시간 차이 허용)
+        expect($response->json('expires_in'))->toBeGreaterThanOrEqual(895);
+        expect($response->json('expires_in'))->toBeLessThanOrEqual(900);
     });
 });

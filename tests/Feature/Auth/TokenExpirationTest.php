@@ -56,7 +56,11 @@ final class TokenExpirationTest extends TestCase
 
         // 토큰 취소 (만료 시뮬레이션)
         $tokenId = $this->getTokenIdFromJwt($tokenResult->accessToken);
+        $this->assertNotNull($tokenId, 'Token ID should be extractable from JWT');
+
         $token = Token::find($tokenId);
+        $this->assertNotNull($token, 'Token should exist in database');
+
         $token->revoke();
 
         $response = $this->withHeader('Authorization', "Bearer {$tokenResult->accessToken}")
@@ -99,7 +103,11 @@ final class TokenExpirationTest extends TestCase
         // 취소된 토큰 생성
         $tokenResult = $this->user->createToken('auth-token');
         $tokenId = $this->getTokenIdFromJwt($tokenResult->accessToken);
+        $this->assertNotNull($tokenId, 'Token ID should be extractable from JWT');
+
         $token = Token::find($tokenId);
+        $this->assertNotNull($token, 'Token should exist in database');
+
         $token->revoke();
 
         $response = $this->withHeader('Authorization', "Bearer {$tokenResult->accessToken}")
@@ -128,6 +136,7 @@ final class TokenExpirationTest extends TestCase
 
     /**
      * JWT에서 토큰 ID 추출
+     * Handles base64url-encoded tokens (URL-safe base64).
      */
     private function getTokenIdFromJwt(string $jwt): ?string
     {
@@ -137,11 +146,25 @@ final class TokenExpirationTest extends TestCase
                 return null;
             }
 
-            $payload = json_decode(base64_decode($parts[1]), true);
+            $payload = json_decode($this->base64UrlDecode($parts[1]), true);
 
             return $payload['jti'] ?? null;
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    /**
+     * Decode base64url-encoded string.
+     */
+    private function base64UrlDecode(string $data): string
+    {
+        $base64 = strtr($data, '-_', '+/');
+        $padding = strlen($base64) % 4;
+        if ($padding > 0) {
+            $base64 .= str_repeat('=', 4 - $padding);
+        }
+
+        return base64_decode($base64);
     }
 }

@@ -35,9 +35,10 @@ final class AuthController extends Controller
         // Create Personal Access Token (JWT)
         $tokenResult = $user->createToken('access_token');
 
-        // Get token expiration time in seconds (from config, default 15 minutes)
-        $expiresInMinutes = (int) config('passport.tokens_expire_in', 15);
-        $expiresInSeconds = $expiresInMinutes * 60;
+        // Get actual token expiration time in seconds from the created token
+        $expiresInSeconds = $tokenResult->token->expires_at
+            ? (int) now()->diffInSeconds($tokenResult->token->expires_at)
+            : (int) config('passport.personal_access_tokens_expire_in', 10080) * 60;
 
         // Create Refresh Token and set as HTTP-only cookie
         $refreshTokenResult = $user->createToken('refresh_token');
@@ -90,15 +91,34 @@ final class AuthController extends Controller
             // Find token using Token model directly
             $token = \Laravel\Passport\Token::find($tokenId);
 
-            if (! $token || $token->revoked) {
+            if (! $token) {
                 return response()->json([
                     'message' => 'Invalid refresh token',
                 ], 401);
             }
 
-            // Revoke old refresh token (Refresh Token Rotation)
-            $token->revoke();
+            // Verify this is a refresh token (not an access token)
+            if ($token->name !== 'refresh_token') {
+                return response()->json([
+                    'message' => 'Invalid refresh token',
+                ], 401);
+            }
 
+            // Check if token is revoked
+            if ($token->revoked) {
+                return response()->json([
+                    'message' => 'Refresh token has been revoked',
+                ], 401);
+            }
+
+            // Check if token has expired
+            if ($token->expires_at && $token->expires_at->isPast()) {
+                return response()->json([
+                    'message' => 'Refresh token has expired',
+                ], 401);
+            }
+
+            // Get user before revoking (for rotation)
             $user = $token->user;
 
             if (! $user) {
@@ -107,10 +127,16 @@ final class AuthController extends Controller
                 ], 401);
             }
 
+            // Revoke old refresh token (Refresh Token Rotation)
+            $token->revoke();
+
             // Issue new tokens
             $tokenResult = $user->createToken('access_token');
-            $expiresInMinutes = (int) config('passport.tokens_expire_in', 15);
-            $expiresInSeconds = $expiresInMinutes * 60;
+
+            // Get actual token expiration time in seconds from the created token
+            $expiresInSeconds = $tokenResult->token->expires_at
+                ? (int) now()->diffInSeconds($tokenResult->token->expires_at)
+                : (int) config('passport.personal_access_tokens_expire_in', 10080) * 60;
 
             $refreshTokenResult = $user->createToken('refresh_token');
             $refreshExpiresInMinutes = (int) config('passport.refresh_tokens_expire_in', 10080);
@@ -141,6 +167,7 @@ final class AuthController extends Controller
 
     /**
      * Extract token ID from JWT.
+     * Handles base64url-encoded tokens (URL-safe base64).
      */
     private function getTokenIdFromJwt(string $jwt): ?string
     {
@@ -150,12 +177,31 @@ final class AuthController extends Controller
                 return null;
             }
 
-            $payload = json_decode(base64_decode($parts[1]), true);
+            // Decode base64url-encoded payload
+            $payload = json_decode($this->base64UrlDecode($parts[1]), true);
 
             return $payload['jti'] ?? null;
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    /**
+     * Decode base64url-encoded string.
+     * Base64url uses '-' instead of '+', '_' instead of '/', and no padding.
+     */
+    private function base64UrlDecode(string $data): string
+    {
+        // Replace URL-safe characters with standard base64 characters
+        $base64 = strtr($data, '-_', '+/');
+
+        // Add padding if needed (base64 strings must have length divisible by 4)
+        $padding = strlen($base64) % 4;
+        if ($padding > 0) {
+            $base64 .= str_repeat('=', 4 - $padding);
+        }
+
+        return base64_decode($base64);
     }
 
     public function logout(Request $request): JsonResponse

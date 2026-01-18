@@ -49,7 +49,9 @@ describe('Token Refresh API', function () {
 
         // 새 Access Token이 발급됨
         expect($response->json('token_type'))->toBe('Bearer');
-        expect($response->json('expires_in'))->toBe(900);
+        // 15분 = 900초 (토큰 생성 후 응답까지 약간의 시간 차이 허용)
+        expect($response->json('expires_in'))->toBeGreaterThanOrEqual(895);
+        expect($response->json('expires_in'))->toBeLessThanOrEqual(900);
 
         // 새 Refresh Token Cookie도 발급됨 (Refresh Token Rotation)
         $response->assertCookie('refresh_token');

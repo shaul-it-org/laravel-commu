@@ -31,7 +31,23 @@ return [
 
     'refresh_tokens_expire_in' => env('PASSPORT_REFRESH_TOKEN_EXPIRE_MINUTES', 10080), // 7 days
 
-    'personal_access_tokens_expire_in' => env('PASSPORT_PERSONAL_TOKEN_EXPIRE_MINUTES', 10080), // 7 days
+    'personal_access_tokens_expire_in' => env('PASSPORT_PERSONAL_TOKEN_EXPIRE_MINUTES', 15), // 15 minutes (same as access tokens)
+
+    /*
+    |--------------------------------------------------------------------------
+    | Personal Access Client
+    |--------------------------------------------------------------------------
+    |
+    | If you wish to use personal access tokens, you may specify the client ID
+    | and secret here. These values are used when issuing personal access
+    | tokens to your users.
+    |
+    */
+
+    'personal_access_client' => [
+        'id' => env('PASSPORT_PERSONAL_ACCESS_CLIENT_ID'),
+        'secret' => env('PASSPORT_PERSONAL_ACCESS_CLIENT_SECRET'),
+    ],
 
     /*
     |--------------------------------------------------------------------------
