@@ -8,7 +8,6 @@ use App\Infrastructure\Persistence\Eloquent\UserModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-
 use Tests\TestCase;
 
 final class ImageUploadTest extends TestCase

@@ -6,7 +6,6 @@ namespace Tests\Feature\User;
 
 use App\Infrastructure\Persistence\Eloquent\UserModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-
 use Tests\TestCase;
 
 final class FollowUserTest extends TestCase

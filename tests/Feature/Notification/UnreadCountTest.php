@@ -7,7 +7,6 @@ namespace Tests\Feature\Notification;
 use App\Infrastructure\Persistence\Eloquent\NotificationModel;
 use App\Infrastructure\Persistence\Eloquent\UserModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-
 use Tests\TestCase;
 
 final class UnreadCountTest extends TestCase

@@ -7,7 +7,6 @@ namespace Tests\Feature\Article;
 use App\Infrastructure\Persistence\Eloquent\ArticleModel;
 use App\Infrastructure\Persistence\Eloquent\UserModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-
 use Tests\TestCase;
 
 final class DraftArticleTest extends TestCase

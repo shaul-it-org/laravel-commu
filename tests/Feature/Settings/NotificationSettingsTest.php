@@ -6,7 +6,6 @@ namespace Tests\Feature\Settings;
 
 use App\Infrastructure\Persistence\Eloquent\UserModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-
 use Tests\TestCase;
 
 final class NotificationSettingsTest extends TestCase
