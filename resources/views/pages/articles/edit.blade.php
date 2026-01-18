@@ -130,10 +130,10 @@
                             <label for="category" class="block text-sm font-medium text-neutral-700 mb-1.5">카테고리 <span class="text-red-500">*</span></label>
                             <select id="category" x-model="category" class="input max-w-xs">
                                 <option value="">카테고리 선택</option>
-                                <option value="기술">기술</option>
-                                <option value="커리어">커리어</option>
-                                <option value="일상">일상</option>
-                                <option value="리뷰">리뷰</option>
+                                <option value="tech">기술</option>
+                                <option value="career">커리어</option>
+                                <option value="life">일상</option>
+                                <option value="news">뉴스</option>
                             </select>
                         </div>
 
@@ -298,10 +298,8 @@
 
                 async fetchArticle() {
                     try {
-                        const response = await fetch(`/api/articles/${this.slug}`, {
-                            headers: {
-                                ...window.auth.getAuthHeaders()
-                            }
+                        const response = await window.auth.fetch(`/api/articles/${this.slug}`, {
+                            method: 'GET'
                         });
 
                         if (!response.ok) {
@@ -331,6 +329,9 @@
                         this.category = this.article.category || '';
                         this.tags = this.article.tags || [];
                     } catch (err) {
+                        if (err.status === 401) {
+                            return; // Already redirected to login
+                        }
                         this.loadError = '게시글을 불러오는데 실패했습니다.';
                     } finally {
                         this.loading = false;
@@ -385,11 +386,8 @@
                         const formData = new FormData();
                         formData.append('image', file);
 
-                        const response = await fetch('/api/images/upload', {
+                        const response = await window.auth.fetch('/api/images/upload', {
                             method: 'POST',
-                            headers: {
-                                ...window.auth.getAuthHeaders()
-                            },
                             body: formData
                         });
 
@@ -406,6 +404,9 @@
 
                         this.content = this.content.substring(0, start) + imageMarkdown + this.content.substring(start);
                     } catch (err) {
+                        if (err.status === 401) {
+                            return; // Already redirected to login
+                        }
                         this.error = err.message;
                     } finally {
                         this.uploading = false;
@@ -424,12 +425,8 @@
                     this.success = null;
 
                     try {
-                        const response = await fetch(`/api/articles/${this.slug}`, {
+                        const response = await window.auth.fetch(`/api/articles/${this.slug}`, {
                             method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                ...window.auth.getAuthHeaders()
-                            },
                             body: JSON.stringify({
                                 title: this.title,
                                 content: this.content,
@@ -454,6 +451,9 @@
                             }, 1000);
                         }
                     } catch (err) {
+                        if (err.status === 401) {
+                            return; // Already redirected to login
+                        }
                         this.error = err.message;
                     } finally {
                         this.saving = false;
@@ -469,11 +469,8 @@
                     this.error = null;
 
                     try {
-                        const response = await fetch(`/api/articles/${this.slug}`, {
-                            method: 'DELETE',
-                            headers: {
-                                ...window.auth.getAuthHeaders()
-                            }
+                        const response = await window.auth.fetch(`/api/articles/${this.slug}`, {
+                            method: 'DELETE'
                         });
 
                         if (!response.ok) {
@@ -489,6 +486,9 @@
                             window.location.href = '/';
                         }, 1000);
                     } catch (err) {
+                        if (err.status === 401) {
+                            return; // Already redirected to login
+                        }
                         this.error = err.message;
                         this.showDeleteModal = false;
                     } finally {

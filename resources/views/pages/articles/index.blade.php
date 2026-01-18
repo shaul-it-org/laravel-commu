@@ -33,7 +33,7 @@
                             @click="filterByCategory(cat)"
                             :class="currentCategory === cat ? 'bg-primary-600 text-white' : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'"
                             class="px-4 py-2 rounded-lg text-sm font-medium transition-colors flex-shrink-0"
-                            x-text="cat"
+                            x-text="categoryLabels[cat] || cat"
                         >
                         </button>
                     </template>
@@ -239,7 +239,13 @@
                 view: 'list',
                 sortBy: 'latest',
                 currentCategory: null,
-                categories: ['기술', '커리어', '일상'],
+                categories: ['tech', 'career', 'life', 'news'],
+                categoryLabels: {
+                    'tech': '기술',
+                    'career': '커리어',
+                    'life': '일상',
+                    'news': '뉴스'
+                },
                 meta: {
                     current_page: 1,
                     last_page: 1,

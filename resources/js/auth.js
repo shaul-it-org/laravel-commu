@@ -127,8 +127,39 @@ export const auth = {
     },
 
     /**
+     * Refresh access token using refresh token cookie
+     * Returns new access token or null if refresh fails
+     */
+    async refreshToken() {
+        try {
+            const response = await fetch('/api/auth/refresh', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'same-origin', // Important: include cookies
+            });
+
+            if (!response.ok) {
+                return null;
+            }
+
+            const data = await response.json();
+            if (data.access_token) {
+                this.setToken(data.access_token);
+                return data.access_token;
+            }
+
+            return null;
+        } catch (e) {
+            return null;
+        }
+    },
+
+    /**
      * Handle 401 Unauthorized response
-     * Clears auth data and redirects to login page
+     * First tries to refresh token, then redirects to login if refresh fails
      */
     handleUnauthorized() {
         this.clear();
@@ -143,31 +174,57 @@ export const auth = {
     },
 
     /**
-     * Authenticated fetch wrapper with automatic 401 handling
+     * Authenticated fetch wrapper with automatic token refresh on 401
      * Use this for all authenticated API requests
+     * For FormData uploads, pass skipContentType: true in options
      */
     async fetch(url, options = {}) {
         const token = this.getToken();
+        const isFormData = options.body instanceof FormData;
 
         const headers = {
             'Accept': 'application/json',
-            'Content-Type': 'application/json',
             ...options.headers,
         };
+
+        // Don't set Content-Type for FormData (browser sets it automatically with boundary)
+        if (!isFormData) {
+            headers['Content-Type'] = 'application/json';
+        }
 
         if (token) {
             headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await fetch(url, {
+        let response = await fetch(url, {
             ...options,
             headers,
+            credentials: 'same-origin',
         });
 
-        // Handle 401 Unauthorized
+        // Handle 401 Unauthorized - try to refresh token first
         if (response.status === 401) {
-            this.handleUnauthorized();
-            throw { status: 401, message: 'Session expired' };
+            const newToken = await this.refreshToken();
+
+            if (newToken) {
+                // Retry the request with new token
+                headers['Authorization'] = `Bearer ${newToken}`;
+                response = await fetch(url, {
+                    ...options,
+                    headers,
+                    credentials: 'same-origin',
+                });
+
+                // If still 401 after refresh, redirect to login
+                if (response.status === 401) {
+                    this.handleUnauthorized();
+                    throw { status: 401, message: 'Session expired' };
+                }
+            } else {
+                // Refresh failed, redirect to login
+                this.handleUnauthorized();
+                throw { status: 401, message: 'Session expired' };
+            }
         }
 
         return response;
