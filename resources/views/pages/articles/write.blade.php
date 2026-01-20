@@ -21,14 +21,7 @@
             <div class="max-w-4xl mx-auto">
                 {{-- Header --}}
                 <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center gap-4">
-                        <a href="/" class="text-neutral-500 hover:text-neutral-700">
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </a>
-                        <h1 class="text-xl font-bold text-neutral-900">새 글 작성</h1>
-                    </div>
+                    <h1 class="text-xl font-bold text-neutral-900">새 글 작성</h1>
                     <div class="flex items-center gap-3">
                         <button type="button" class="btn-outline" @click="showPreview = !showPreview">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
