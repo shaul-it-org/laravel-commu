@@ -68,7 +68,7 @@ export const auth = {
                         'Authorization': `Bearer ${token}`,
                         'Accept': 'application/json',
                     },
-                    credentials: 'same-origin',
+                    credentials: 'include',
                 });
             } catch (e) {
                 // Ignore logout errors
@@ -94,7 +94,7 @@ export const auth = {
                     'Authorization': `Bearer ${token}`,
                     'Accept': 'application/json',
                 },
-                credentials: 'same-origin',
+                credentials: 'include',
             });
 
             if (!response.ok) {
@@ -155,27 +155,34 @@ export const auth = {
      */
     async _doRefreshToken() {
         try {
+            console.debug('[Auth] Attempting token refresh...');
+
             const response = await fetch('/api/auth/refresh', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
-                credentials: 'same-origin', // Important: include cookies
+                credentials: 'include', // Changed: 'include' ensures cookies are sent cross-origin
             });
 
             if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                console.warn('[Auth] Token refresh failed:', response.status, errorData.message || 'Unknown error');
                 return null;
             }
 
             const data = await response.json();
             if (data.access_token) {
+                console.debug('[Auth] Token refresh successful, new token received');
                 this.setToken(data.access_token);
                 return data.access_token;
             }
 
+            console.warn('[Auth] Token refresh response missing access_token');
             return null;
         } catch (e) {
+            console.error('[Auth] Token refresh error:', e);
             return null;
         }
     },
@@ -222,29 +229,33 @@ export const auth = {
         let response = await fetch(url, {
             ...options,
             headers,
-            credentials: 'same-origin',
+            credentials: 'include', // Changed: ensure cookies are sent
         });
 
         // Handle 401 Unauthorized - try to refresh token first
         if (response.status === 401) {
+            console.debug('[Auth] Received 401, attempting token refresh for:', url);
             const newToken = await this.refreshToken();
 
             if (newToken) {
+                console.debug('[Auth] Retrying request with new token:', url);
                 // Retry the request with new token
                 headers['Authorization'] = `Bearer ${newToken}`;
                 response = await fetch(url, {
                     ...options,
                     headers,
-                    credentials: 'same-origin',
+                    credentials: 'include',
                 });
 
                 // If still 401 after refresh, redirect to login
                 if (response.status === 401) {
+                    console.warn('[Auth] Still 401 after token refresh, redirecting to login');
                     this.handleUnauthorized();
                     throw { status: 401, message: 'Session expired' };
                 }
             } else {
                 // Refresh failed, redirect to login
+                console.warn('[Auth] Token refresh failed, redirecting to login');
                 this.handleUnauthorized();
                 throw { status: 401, message: 'Session expired' };
             }
