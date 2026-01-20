@@ -186,11 +186,11 @@
                             x-cloak
                         >
                             <div class="px-6 pb-6 pt-2 space-y-5 border-t border-neutral-200/50">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-5">
                                 {{-- Category --}}
                                 <div>
                                     <label for="category" class="block text-sm font-medium text-neutral-700 mb-1.5">카테고리</label>
-                                    <select id="category" x-model="category" class="input w-full">
+                                    <select id="category" x-model="category" class="input max-w-xs">
                                         <option value="">카테고리 선택</option>
                                         <option value="tech">기술</option>
                                         <option value="career">커리어</option>
@@ -203,7 +203,7 @@
                                 <div class="relative">
                                     <label class="block text-sm font-medium text-neutral-700 mb-1.5">태그</label>
                                     {{-- Tag Input --}}
-                                    <div class="relative">
+                                    <div class="relative max-w-md">
                                         <input
                                             type="text"
                                             x-model="tagInput"
