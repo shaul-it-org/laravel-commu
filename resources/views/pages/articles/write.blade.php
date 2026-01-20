@@ -307,8 +307,10 @@
                         const response = await fetch(`/api/tags/search?q=${encodeURIComponent(query)}&limit=5`);
                         if (response.ok) {
                             const data = await response.json();
+                            // Case-insensitive filter to exclude already added tags
+                            const existingTagsLower = this.tags.map(t => t.toLowerCase());
                             this.tagSuggestions = data.data.filter(tag =>
-                                !this.tags.includes(tag.name)
+                                !existingTagsLower.includes(tag.name.toLowerCase())
                             );
                             this.showTagSuggestions = true;
                             this.selectedSuggestionIndex = -1;
@@ -321,7 +323,9 @@
                 },
 
                 selectTagSuggestion(suggestion) {
-                    if (!this.tags.includes(suggestion.name)) {
+                    // Case-insensitive duplicate check
+                    const existingTagsLower = this.tags.map(t => t.toLowerCase());
+                    if (!existingTagsLower.includes(suggestion.name.toLowerCase())) {
                         this.tags.push(suggestion.name);
                     }
                     this.tagInput = '';
@@ -337,9 +341,10 @@
                         return;
                     }
 
-                    // Otherwise, add the input as a new tag
+                    // Otherwise, add the input as a new tag (case-insensitive duplicate check)
                     const tagName = this.tagInput.trim();
-                    if (tagName && !this.tags.includes(tagName)) {
+                    const existingTagsLower = this.tags.map(t => t.toLowerCase());
+                    if (tagName && !existingTagsLower.includes(tagName.toLowerCase())) {
                         this.tags.push(tagName);
                     }
                     this.tagInput = '';
