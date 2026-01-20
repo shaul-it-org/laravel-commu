@@ -21,15 +21,15 @@
             <div class="max-w-4xl mx-auto">
                 {{-- Header --}}
                 <div class="flex items-center justify-between mb-6">
-                    <h1 class="text-xl font-bold text-neutral-900">새 글 작성</h1>
                     <div class="flex items-center gap-3">
-                        <button type="button" class="btn-outline" @click="showPreview = !showPreview">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        <button type="button" @click="window.history.back()" class="p-2 -ml-2 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 rounded-lg transition-colors">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                             </svg>
-                            <span x-text="showPreview ? '편집' : '미리보기'"></span>
                         </button>
+                        <h1 class="text-xl font-bold text-neutral-900">새 글 작성</h1>
+                    </div>
+                    <div class="flex items-center gap-3">
                         <button
                             type="button"
                             class="btn-outline"
@@ -62,7 +62,7 @@
                 </div>
 
                 {{-- Editor --}}
-                <div x-show="!showPreview" class="space-y-4">
+                <div class="space-y-4">
                     {{-- Required Fields Section --}}
                     <div class="card">
                         <div class="p-6 space-y-6">
@@ -184,6 +184,7 @@
                                     <label for="category" class="block text-sm font-medium text-neutral-700 mb-1.5">카테고리</label>
                                     <select id="category" x-model="category" class="input max-w-xs">
                                         <option value="">카테고리 선택</option>
+                                        <option value="general">일반</option>
                                         <option value="tech">기술</option>
                                         <option value="career">커리어</option>
                                         <option value="life">일상</option>
@@ -264,20 +265,6 @@
                     </div>
                 </div>
 
-                {{-- Preview --}}
-                <div class="card" x-show="showPreview" x-cloak>
-                    <div class="p-6">
-                        <div class="prose prose-neutral max-w-none">
-                            <h1 x-text="title || '제목 없음'" class="text-3xl font-bold mb-4"></h1>
-                            <div class="flex flex-wrap gap-2 mb-6" x-show="tags.length > 0">
-                                <template x-for="tag in tags" :key="tag">
-                                    <span class="text-sm text-primary-600" x-text="'#' + tag"></span>
-                                </template>
-                            </div>
-                            <div class="whitespace-pre-wrap" x-text="content || '내용을 입력하세요...'"></div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </template>
     </div>
@@ -295,7 +282,6 @@
                 showTagSuggestions: false,
                 selectedSuggestionIndex: -1,
                 searchingTags: false,
-                showPreview: false,
                 showOptionalFields: false,
                 isAuthenticated: false,
                 saving: false,
