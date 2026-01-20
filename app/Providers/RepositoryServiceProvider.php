@@ -11,7 +11,7 @@ use App\Infrastructure\Persistence\Eloquent\EloquentArticleRepository;
 use App\Infrastructure\Persistence\Eloquent\EloquentUserRepository;
 use App\Infrastructure\Services\BcryptPasswordHasher;
 use App\Infrastructure\Services\MarkdownParserInterface;
-use App\Infrastructure\Services\SimpleMarkdownParser;
+use App\Infrastructure\Services\MermaidMarkdownParser;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -23,7 +23,7 @@ class RepositoryServiceProvider extends ServiceProvider
         UserRepositoryInterface::class => EloquentUserRepository::class,
         PasswordHasherInterface::class => BcryptPasswordHasher::class,
         ArticleRepositoryInterface::class => EloquentArticleRepository::class,
-        MarkdownParserInterface::class => SimpleMarkdownParser::class,
+        MarkdownParserInterface::class => MermaidMarkdownParser::class,
     ];
 
     public function register(): void
