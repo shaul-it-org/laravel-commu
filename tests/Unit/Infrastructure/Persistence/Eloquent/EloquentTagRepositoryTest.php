@@ -136,4 +136,184 @@ final class EloquentTagRepositoryTest extends TestCase
         $this->assertContains('Laravel', $names);
         $this->assertContains('PHP', $names);
     }
+
+    #[Test]
+    public function find_returns_tag_by_id(): void
+    {
+        $uuid = fake()->uuid();
+        TagModel::create(['uuid' => $uuid, 'name' => 'Laravel', 'slug' => 'laravel']);
+
+        $tagId = new \App\Domain\Core\Tag\ValueObjects\TagId($uuid);
+        $tag = $this->repository->find($tagId);
+
+        $this->assertInstanceOf(Tag::class, $tag);
+        $this->assertEquals('Laravel', $tag->name());
+    }
+
+    #[Test]
+    public function find_returns_null_for_nonexistent_id(): void
+    {
+        $tagId = new \App\Domain\Core\Tag\ValueObjects\TagId(fake()->uuid());
+        $tag = $this->repository->find($tagId);
+
+        $this->assertNull($tag);
+    }
+
+    #[Test]
+    public function find_by_slug_returns_tag(): void
+    {
+        TagModel::create(['uuid' => fake()->uuid(), 'name' => 'Laravel', 'slug' => 'laravel']);
+
+        $tag = $this->repository->findBySlug('laravel');
+
+        $this->assertInstanceOf(Tag::class, $tag);
+        $this->assertEquals('Laravel', $tag->name());
+    }
+
+    #[Test]
+    public function find_by_slug_returns_null_for_nonexistent(): void
+    {
+        $tag = $this->repository->findBySlug('nonexistent');
+
+        $this->assertNull($tag);
+    }
+
+    #[Test]
+    public function find_by_ids_returns_matching_tags(): void
+    {
+        $uuid1 = fake()->uuid();
+        $uuid2 = fake()->uuid();
+        TagModel::create(['uuid' => $uuid1, 'name' => 'Laravel', 'slug' => 'laravel']);
+        TagModel::create(['uuid' => $uuid2, 'name' => 'PHP', 'slug' => 'php']);
+        TagModel::create(['uuid' => fake()->uuid(), 'name' => 'JavaScript', 'slug' => 'javascript']);
+
+        $ids = [
+            new \App\Domain\Core\Tag\ValueObjects\TagId($uuid1),
+            new \App\Domain\Core\Tag\ValueObjects\TagId($uuid2),
+        ];
+        $tags = $this->repository->findByIds($ids);
+
+        $this->assertCount(2, $tags);
+    }
+
+    #[Test]
+    public function find_by_ids_returns_empty_array_for_empty_input(): void
+    {
+        $tags = $this->repository->findByIds([]);
+
+        $this->assertIsArray($tags);
+        $this->assertCount(0, $tags);
+    }
+
+    #[Test]
+    public function delete_soft_deletes_tag(): void
+    {
+        $uuid = fake()->uuid();
+        TagModel::create(['uuid' => $uuid, 'name' => 'Laravel', 'slug' => 'laravel']);
+
+        $tagId = new \App\Domain\Core\Tag\ValueObjects\TagId($uuid);
+        $tag = $this->repository->find($tagId);
+
+        $this->repository->delete($tag);
+
+        // Soft deleted이므로 일반 쿼리에서는 찾을 수 없음
+        $this->assertNull($this->repository->find($tagId));
+        // withTrashed로는 찾을 수 있음
+        $this->assertDatabaseHas('tags', ['uuid' => $uuid]);
+    }
+
+    #[Test]
+    public function search_is_case_insensitive(): void
+    {
+        TagModel::create(['uuid' => fake()->uuid(), 'name' => 'Laravel', 'slug' => 'laravel']);
+        TagModel::create(['uuid' => fake()->uuid(), 'name' => 'LARAVEL Mix', 'slug' => 'laravel-mix']);
+
+        $results = $this->repository->search('laravel', 10);
+
+        $this->assertCount(2, $results);
+    }
+
+    #[Test]
+    public function find_popular_respects_limit_parameter(): void
+    {
+        TagModel::create(['uuid' => fake()->uuid(), 'name' => 'Tag1', 'slug' => 'tag1', 'article_count' => 100]);
+        TagModel::create(['uuid' => fake()->uuid(), 'name' => 'Tag2', 'slug' => 'tag2', 'article_count' => 50]);
+        TagModel::create(['uuid' => fake()->uuid(), 'name' => 'Tag3', 'slug' => 'tag3', 'article_count' => 25]);
+        TagModel::create(['uuid' => fake()->uuid(), 'name' => 'Tag4', 'slug' => 'tag4', 'article_count' => 10]);
+
+        $results = $this->repository->findPopular(2);
+
+        $this->assertCount(2, $results);
+        $this->assertEquals('Tag1', $results[0]->name());
+        $this->assertEquals('Tag2', $results[1]->name());
+    }
+
+    #[Test]
+    public function find_or_create_handles_korean_names(): void
+    {
+        $tag = $this->repository->findOrCreate('라라벨');
+
+        $this->assertInstanceOf(Tag::class, $tag);
+        $this->assertEquals('라라벨', $tag->name());
+        $this->assertEquals('라라벨', $tag->slug());
+        $this->assertDatabaseHas('tags', ['name' => '라라벨']);
+    }
+
+    #[Test]
+    public function save_updates_existing_tag(): void
+    {
+        $uuid = fake()->uuid();
+        TagModel::create(['uuid' => $uuid, 'name' => 'Laravel', 'slug' => 'laravel', 'article_count' => 5]);
+
+        $tagId = new \App\Domain\Core\Tag\ValueObjects\TagId($uuid);
+        $tag = $this->repository->find($tagId);
+
+        // Increment article count
+        $tag->incrementArticleCount();
+        $this->repository->save($tag);
+
+        $updatedTag = $this->repository->find($tagId);
+        $this->assertEquals(6, $updatedTag->articleCount());
+    }
+
+    #[Test]
+    public function find_by_names_returns_empty_array_for_no_match(): void
+    {
+        TagModel::create(['uuid' => fake()->uuid(), 'name' => 'Laravel', 'slug' => 'laravel']);
+
+        $results = $this->repository->findByNames(['NonExistent', 'AlsoNotFound']);
+
+        $this->assertIsArray($results);
+        $this->assertCount(0, $results);
+    }
+
+    #[Test]
+    public function find_by_article_ids_returns_empty_for_no_tags(): void
+    {
+        $user = UserModel::create([
+            'uuid' => fake()->uuid(),
+            'name' => 'Test User',
+            'email' => 'test2@example.com',
+            'username' => 'testuser2',
+            'password' => 'password',
+        ]);
+
+        $article = ArticleModel::create([
+            'uuid' => fake()->uuid(),
+            'author_id' => $user->id,
+            'title' => 'Test Article',
+            'slug' => 'test-article-no-tags',
+            'content_markdown' => 'Content',
+            'content_html' => '<p>Content</p>',
+            'category' => 'tech',
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
+
+        $articleId = new \App\Domain\Core\Article\ValueObjects\ArticleId($article->uuid);
+        $result = $this->repository->findByArticleIds([$articleId]);
+
+        $this->assertArrayHasKey($article->uuid, $result);
+        $this->assertCount(0, $result[$article->uuid]);
+    }
 }

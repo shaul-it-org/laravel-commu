@@ -456,4 +456,206 @@ final class TagApiTest extends TestCase
         $this->assertEquals(2, $tag2->fresh()->article_count);
         $this->assertEquals(0, $tag3->fresh()->article_count);
     }
+
+    #[Test]
+    public function search_returns_empty_for_missing_query(): void
+    {
+        TagModel::create(['uuid' => fake()->uuid(), 'name' => 'Laravel', 'slug' => 'laravel']);
+
+        $response = $this->getJson('/api/tags/search');
+
+        $response->assertStatus(200)
+            ->assertJson(['data' => []]);
+    }
+
+    #[Test]
+    public function popular_caps_limit_at_50(): void
+    {
+        // 60개의 태그 생성
+        for ($i = 1; $i <= 60; $i++) {
+            TagModel::create([
+                'uuid' => fake()->uuid(),
+                'name' => "Tag{$i}",
+                'slug' => "tag-{$i}",
+                'article_count' => 60 - $i,
+            ]);
+        }
+
+        // limit=100으로 요청해도 최대 50개만 반환
+        $response = $this->getJson('/api/tags/popular?limit=100');
+
+        $response->assertStatus(200);
+        $this->assertLessThanOrEqual(50, count($response->json('data')));
+    }
+
+    #[Test]
+    public function articles_endpoint_filters_draft_articles(): void
+    {
+        $tag = TagModel::create(['uuid' => fake()->uuid(), 'name' => 'Laravel', 'slug' => 'laravel']);
+
+        // 발행된 아티클
+        $publishedArticle = ArticleModel::create([
+            'uuid' => fake()->uuid(),
+            'author_id' => $this->user->id,
+            'title' => 'Published Article',
+            'slug' => 'published-article',
+            'content_markdown' => 'Content',
+            'content_html' => '<p>Content</p>',
+            'category' => 'tech',
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
+
+        // 임시저장 아티클
+        $draftArticle = ArticleModel::create([
+            'uuid' => fake()->uuid(),
+            'author_id' => $this->user->id,
+            'title' => 'Draft Article',
+            'slug' => 'draft-article',
+            'content_markdown' => 'Content',
+            'content_html' => '<p>Content</p>',
+            'category' => 'tech',
+            'status' => 'draft',
+        ]);
+
+        $tag->articles()->attach([$publishedArticle->id, $draftArticle->id]);
+
+        $response = $this->getJson("/api/tags/{$tag->slug}/articles");
+
+        $response->assertStatus(200);
+        // 발행된 아티클만 반환
+        $this->assertCount(1, $response->json('data'));
+        $this->assertEquals('Published Article', $response->json('data.0.title'));
+    }
+
+    #[Test]
+    public function articles_endpoint_paginates_correctly(): void
+    {
+        $tag = TagModel::create(['uuid' => fake()->uuid(), 'name' => 'Laravel', 'slug' => 'laravel']);
+
+        // 15개의 아티클 생성
+        for ($i = 1; $i <= 15; $i++) {
+            $article = ArticleModel::create([
+                'uuid' => fake()->uuid(),
+                'author_id' => $this->user->id,
+                'title' => "Article {$i}",
+                'slug' => "article-{$i}",
+                'content_markdown' => 'Content',
+                'content_html' => '<p>Content</p>',
+                'category' => 'tech',
+                'status' => 'published',
+                'published_at' => now()->subMinutes($i),
+            ]);
+            $tag->articles()->attach($article->id);
+        }
+
+        // 첫 페이지 (5개씩)
+        $response = $this->getJson("/api/tags/{$tag->slug}/articles?per_page=5&page=1");
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'data',
+                'meta' => ['total', 'per_page', 'current_page', 'last_page'],
+            ]);
+
+        $this->assertCount(5, $response->json('data'));
+        $this->assertEquals(15, $response->json('meta.total'));
+        $this->assertEquals(5, $response->json('meta.per_page'));
+        $this->assertEquals(1, $response->json('meta.current_page'));
+        $this->assertEquals(3, $response->json('meta.last_page'));
+
+        // 두 번째 페이지
+        $response2 = $this->getJson("/api/tags/{$tag->slug}/articles?per_page=5&page=2");
+        $this->assertEquals(2, $response2->json('meta.current_page'));
+    }
+
+    #[Test]
+    public function articles_endpoint_returns_404_for_nonexistent_tag(): void
+    {
+        $response = $this->getJson('/api/tags/nonexistent-tag/articles');
+
+        $response->assertStatus(404);
+    }
+
+    #[Test]
+    public function articles_endpoint_orders_by_published_date_desc(): void
+    {
+        $tag = TagModel::create(['uuid' => fake()->uuid(), 'name' => 'Laravel', 'slug' => 'laravel']);
+
+        $oldArticle = ArticleModel::create([
+            'uuid' => fake()->uuid(),
+            'author_id' => $this->user->id,
+            'title' => 'Old Article',
+            'slug' => 'old-article',
+            'content_markdown' => 'Content',
+            'content_html' => '<p>Content</p>',
+            'category' => 'tech',
+            'status' => 'published',
+            'published_at' => now()->subDays(7),
+        ]);
+
+        $newArticle = ArticleModel::create([
+            'uuid' => fake()->uuid(),
+            'author_id' => $this->user->id,
+            'title' => 'New Article',
+            'slug' => 'new-article',
+            'content_markdown' => 'Content',
+            'content_html' => '<p>Content</p>',
+            'category' => 'tech',
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
+
+        $tag->articles()->attach([$oldArticle->id, $newArticle->id]);
+
+        $response = $this->getJson("/api/tags/{$tag->slug}/articles");
+
+        $response->assertStatus(200);
+        // 최신 아티클이 먼저
+        $this->assertEquals('New Article', $response->json('data.0.title'));
+        $this->assertEquals('Old Article', $response->json('data.1.title'));
+    }
+
+    #[Test]
+    public function can_get_tags_with_korean_names(): void
+    {
+        TagModel::create(['uuid' => fake()->uuid(), 'name' => '라라벨', 'slug' => '라라벨']);
+        TagModel::create(['uuid' => fake()->uuid(), 'name' => '프로그래밍', 'slug' => '프로그래밍']);
+
+        $response = $this->getJson('/api/tags');
+
+        $response->assertStatus(200);
+
+        $tagNames = collect($response->json('data'))->pluck('name')->toArray();
+        $this->assertContains('라라벨', $tagNames);
+        $this->assertContains('프로그래밍', $tagNames);
+    }
+
+    #[Test]
+    public function search_respects_limit_parameter(): void
+    {
+        // 15개의 'Test' 태그 생성
+        for ($i = 1; $i <= 15; $i++) {
+            TagModel::create(['uuid' => fake()->uuid(), 'name' => "Test{$i}", 'slug' => "test-{$i}"]);
+        }
+
+        // limit=5로 요청
+        $response = $this->getJson('/api/tags/search?q=Test&limit=5');
+
+        $response->assertStatus(200);
+        $this->assertCount(5, $response->json('data'));
+    }
+
+    #[Test]
+    public function search_finds_korean_tags(): void
+    {
+        TagModel::create(['uuid' => fake()->uuid(), 'name' => '라라벨', 'slug' => '라라벨']);
+        TagModel::create(['uuid' => fake()->uuid(), 'name' => '리액트', 'slug' => '리액트']);
+
+        $response = $this->getJson('/api/tags/search?q='.urlencode('라라'));
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $response->json('data'));
+        $this->assertEquals('라라벨', $response->json('data.0.name'));
+    }
 }

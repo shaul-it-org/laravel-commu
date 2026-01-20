@@ -366,11 +366,13 @@ Authorization: Bearer {token}
 **Validation Rules:**
 - `title`: required, string, min:5, max:200
 - `content`: required, string, min:100
-- `category`: required, in:tech,career,life,review
-- `tags`: array, max:5
-- `tags.*`: string, max:20
+- `category`: nullable, in:tech,career,life,review,general
+- `tags`: array (선택)
+- `tags.*`: string, max:50
 - `status`: required, in:draft,published
 - `thumbnail`: nullable, image, max:2048
+
+> **Note:** 태그 검증 규칙은 `CreateArticleRequest.php` 참조. 태그 배열 크기 제한 없음.
 
 **Response (201 Created):**
 ```json
@@ -1118,9 +1120,11 @@ Authorization: Bearer {token}
 ## 7. Tags API
 
 ### 7.1 태그 목록 조회
-```
+```http
 GET /api/tags
 ```
+
+> **Note:** Tags API는 `/api/v1` 접두사 없이 `/api/tags`를 사용합니다.
 
 **Query Parameters:**
 | Parameter | Type | Default | Description |
@@ -1157,7 +1161,7 @@ GET /api/tags
 ---
 
 ### 7.2 인기 태그 조회
-```
+```http
 GET /api/tags/popular
 ```
 
@@ -1190,7 +1194,7 @@ GET /api/tags/popular
 ---
 
 ### 7.3 태그 검색 (자동완성)
-```
+```http
 GET /api/tags/search
 ```
 
@@ -1218,7 +1222,7 @@ GET /api/tags/search
 ---
 
 ### 7.4 태그 상세 조회
-```
+```http
 GET /api/tags/{slug}
 ```
 
@@ -1250,7 +1254,7 @@ GET /api/tags/{slug}
 ---
 
 ### 7.5 태그별 아티클 목록
-```
+```http
 GET /api/tags/{slug}/articles
 ```
 
@@ -1310,7 +1314,7 @@ GET /api/tags/{slug}/articles
 아티클 생성/수정 시 태그를 함께 지정할 수 있습니다.
 
 **아티클 생성 시 태그 추가:**
-```
+```http
 POST /api/articles
 Authorization: Bearer {token}
 ```
@@ -1328,6 +1332,8 @@ Authorization: Bearer {token}
 **Validation Rules:**
 - `tags`: array (선택)
 - `tags.*`: string, max:50
+
+> **Note:** 검증 규칙은 `app/Http/Requests/Article/CreateArticleRequest.php` 참조.
 
 **동작:**
 - 존재하지 않는 태그는 자동으로 생성됨
