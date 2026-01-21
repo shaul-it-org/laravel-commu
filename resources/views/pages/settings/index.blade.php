@@ -142,6 +142,27 @@
                             <p class="text-sm text-neutral-600 mb-4">소셜 계정을 연동하여 간편하게 로그인하세요</p>
 
                             <div class="space-y-3">
+                                {{-- Keycloak SSO --}}
+                                <div class="flex items-center justify-between p-4 border border-neutral-200 rounded-lg">
+                                    <div class="flex items-center gap-3">
+                                        <div :class="socialAccounts.keycloak ? 'bg-primary-600' : 'bg-neutral-100'" class="w-10 h-10 flex items-center justify-center rounded-full">
+                                            <svg class="w-5 h-5" :class="socialAccounts.keycloak ? 'text-white' : 'text-neutral-400'" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <span class="font-medium text-neutral-900">SSO (Keycloak)</span>
+                                            <p class="text-sm" :class="socialAccounts.keycloak ? 'text-neutral-600' : 'text-neutral-500'" x-text="socialAccounts.keycloak ? (socialAccounts.keycloak.provider_email || socialAccounts.keycloak.nickname) : '연동되지 않음'"></p>
+                                        </div>
+                                    </div>
+                                    <template x-if="!socialAccounts.keycloak">
+                                        <button @click="linkSocialAccount('keycloak')" class="btn-outline text-sm" :disabled="socialLoading">연동하기</button>
+                                    </template>
+                                    <template x-if="socialAccounts.keycloak">
+                                        <span class="text-sm text-green-600 font-medium">연동됨</span>
+                                    </template>
+                                </div>
+
                                 {{-- GitHub --}}
                                 <div class="flex items-center justify-between p-4 border border-neutral-200 rounded-lg">
                                     <div class="flex items-center gap-3">
@@ -316,7 +337,7 @@
             deleting: false,
 
             // Social Account Linking
-            socialAccounts: { github: null },
+            socialAccounts: { keycloak: null, github: null },
             socialLoading: false,
 
             async init() {
@@ -484,7 +505,7 @@
                     const response = await window.auth.fetch('/api/auth/social-accounts');
                     if (response.ok) {
                         const data = await response.json();
-                        this.socialAccounts = data.data || { github: null };
+                        this.socialAccounts = data.data || { keycloak: null, github: null };
                     }
                 } catch (error) {
                     console.error('Failed to fetch social accounts:', error);
