@@ -22,6 +22,11 @@ pipeline {
             defaultValue: '',
             description: '롤백할 버전 (rollback 시 사용, 비워두면 이전 버전으로 롤백)'
         )
+        password(
+            name: 'KEYCLOAK_CLIENT_SECRET',
+            defaultValue: '',
+            description: 'Keycloak Client Secret (dev 환경 배포 시 필요, 비워두면 기존 설정 유지)'
+        )
     }
 
     environment {
@@ -275,6 +280,18 @@ pipeline {
                                 sh -c 'cat > /var/www/html/.env'
                         """
                         echo ".env file injected from Jenkins Config File Provider"
+                    }
+
+                    // Keycloak 환경변수 주입 (dev 환경)
+                    if (params.ENVIRONMENT == 'dev' && params.KEYCLOAK_CLIENT_SECRET?.trim()) {
+                        sh """
+                            docker run --rm \
+                                -v ${env.DEPLOY_PATH}:/var/www/html \
+                                -e KEYCLOAK_SECRET="${params.KEYCLOAK_CLIENT_SECRET}" \
+                                alpine:latest \
+                                sh -c 'echo "" >> /var/www/html/.env && echo "# Keycloak OAuth" >> /var/www/html/.env && echo "KEYCLOAK_CLIENT_ID=blogs-dev" >> /var/www/html/.env && echo "KEYCLOAK_CLIENT_SECRET=\${KEYCLOAK_SECRET}" >> /var/www/html/.env && echo "KEYCLOAK_BASE_URL=https://dev-keycloak.shaul.kr" >> /var/www/html/.env && echo "KEYCLOAK_REALM=dev" >> /var/www/html/.env'
+                        """
+                        echo "Keycloak environment variables injected"
                     }
                 }
             }
